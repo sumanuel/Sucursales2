@@ -1,0 +1,206 @@
+/* CSS Document */
+h1, h2{ color:#0075be;}
+.grafica, .mano {cursor: pointer;}
+.table-nonfluid {
+   width: auto;
+}
+.centrado {
+    float: none; margin: 0 auto; text-align: center; display: block; width:auto; height:auto;
+}
+#formularioIngreso { padding-top:7%}
+.error {
+	margin-left: 10px;
+	width: auto;
+	display: inline;
+	color:#F00;}
+.fondo100{ background-color:#08CE3F; cursor:pointer;}
+.fondo50{ background-color:#fff400;cursor:pointer;}
+.fondo0{ background-color:#ff0000;cursor:pointer;}
+.mueveBloqueIzq{
+    margin-left: -2%;
+}
+.margen0{margin-left:0%;}
+.subeCuadro{margin-top: -46%}
+.oculto{ display: none;}
+label.error { display: none; }
+.rating {
+  unicode-bidi: bidi-override;
+  font-size: 20px;
+  direction: rtl;
+  text-align: center;
+  cursor: pointer;
+}
+.rating > span {
+  display: inline-block;
+  position: relative;
+  width: 1.1em;
+}
+.rating > span:hover,
+.rating > span:hover ~ span {
+  color: transparent;
+}
+.rating > span:hover:before,
+.rating > span:hover ~ span:before {
+   content: "\2605";
+   position: absolute;
+   left: 0;
+   color: gold;
+}
+
+.colorFeriado{ background-color: #FABEBE;}
+.cajaEspecial{padding-left: 1%;
+padding-right: 1%;}
+body .modal {
+    /* new custom width */
+    width: 60%;
+    /*height: 600px;*/
+    /* must be half of the width, minus scrollbar on the left (30px) */
+    margin-left: -30%;
+}
+body .modal-body{
+  height: 25%;
+}
+.h7{
+  font-size: 9.9px;
+  margin: 10px 0;
+  font-family: inherit;
+  font-weight: bold;
+  line-height: 20px;
+  color: inherit;
+  text-rendering: optimizelegibility;
+}
+
+img {
+    height:auto;
+    width: auto;
+}
+.centra-progreso{
+  margin-top: 10px;
+}
+.colorCampoMatrix{
+  background-color:#FC3
+}
+.sticky {  
+    position: fixed;  
+    left: 0;  
+    bottom: 0%;
+    z-index: 100;  
+    border-top: 1px;
+    background-color: #F3F3F3;
+}
+.sticky2 {  
+    position: fixed;  
+    left: 0;  
+    bottom: 0%;
+
+    z-index: 100;  
+    border-top: 1px;
+    background-color: #F3F3F3;
+}
+.sobre{
+  background-color: #757575;
+  color: #fff;
+  border-radius: 5px 5px 0 0;
+}
+.sobre2{
+  background-color: #757575;
+  color: #fff;
+  border-radius: 5px 5px 0 0;
+}
+.formulario{
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #d1d1d1;
+}
+#divMensajesTw{background-color: #fff;
+overflow-y: scroll;
+height: 450px;
+ scrollbar-face-color: #cacaca;
+
+ scrollbar-highlight-color: #cacaca;
+
+ scrollbar-3dlight-color: #cacaca;
+
+ scrollbar-darkshadow-color: #cacaca;
+
+ scrollbar-shadow-color: #cacaca;
+
+ scrollbar-arrow-color: #000000;
+
+ scrollbar-track-color: #cacaca;
+ border-left: 1px solid #CFCECE;
+ border-radius: 10px;
+
+}
+.claseAgregarMensaje{
+   background-color: #F3F3F3;
+}
+.claseAgregarMensaje2{
+  background-color: #ccc;
+}
+.twGris1{
+  background-color: #705959;
+}
+.twMargen1{
+  margin-bottom: 5px;
+}
+.twPad{
+  line-height: 4px  !important;
+}
+.twGris2{
+  background-color: #6D6D6D;
+}
+.table tbody tr.success2 > td {
+background-color: #f2dede;
+}
+.textoCentrado{
+  text-align: center !important;
+}
+.textoDerecha{
+  text-align: right !important;
+}
+.mensajeTl{
+border: 1px solid #D1DAEC !important;
+border-radius: 10px !important;
+padding: 10px !important;
+padding-top: 10px !important;
+padding-left: 5px !important;
+padding-right: 10px !important;
+}
+.mensajeTl2{
+border: 1px solid #ff0000 !important;
+border-radius: 10px !important;
+padding: 10px !important;
+padding-top: 10px !important;
+padding-left: 5px !important;
+padding-right: 10px !important;
+}
+.noLink{
+  color: inherit !important;
+  text-decoration: initial !important;
+}
+.bajaLetra{
+  font-size: 10px;
+}
+.icon-5x {
+font-size: 5em;
+}
+.icon-6x {
+font-size: 6em;
+}
+.table tbody tr.errorNumero > td {
+  background-color: #f2dede;
+}
+.table-hover tbody tr.errorNumero:hover > td {
+  background-color: #ebcccc;
+}
+.negritas{
+  font-weight:bold;
+}
+/*.seleccionado{
+  background-color: #409848;
+  color: #ffffff;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}*/

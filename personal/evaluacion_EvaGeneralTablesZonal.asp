@@ -1,0 +1,58 @@
+
+<!--#include file="../funciones.asp"-->
+<%
+periodo = trim(request("periodo"))
+
+
+sql = "exec SUC_prc_eva_get_zonal "&periodo
+
+'response.write(sql)
+'response.end()
+
+set rs = db.execute(sql)
+%>
+<style>		
+	.table-hover1>tbody>tr:hover>td, .table-hover1>tbody>tr:hover>th {
+  		background-color: #d9ffb3;
+  		color:#0d0d0d;
+	}
+
+</style>
+<table id="tabzonales" class="table table-bordered table-hover1 table-condensed" data-periodo="<%=periodo%>" style="border-bottom: 2px solid">
+	<thead style="background-color: #e6f2ff; ">
+		<th style="border-bottom: 1px solid; border-top: 2px solid; border-left: 2px solid;">Nombre</th>
+		<th style="border-bottom: 1px solid; border-top: 2px solid; border-left: 1px solid;">Buenos</th>
+		<th style="border-bottom: 1px solid; border-top: 2px solid; border-left: 1px solid;">Normal</th>
+		<th style="border-bottom: 1px solid; border-top: 2px solid; border-left: 1px solid;border-right: 2px solid;">Malos</th>
+	</thead>
+	<tbody >
+		<% if not rs.eof then		
+			do while not rs.eof 	
+				nombre = rs("NOMBRE")
+				buenos = rs("BUENO") 
+				regular = rs("NORMAL") 
+				malos = rs("MALO")
+				%>
+				<tr class="mano" onclick="llenasucursal('<%=nombre%>')">												
+					<td style="border-left: 2px solid;"><%=nombre%></td>
+					<td style="border-left: 1px solid;"><%=buenos%></td>
+					<td style="border-left: 1px solid;"><%=regular%></td>
+					<td style="border-right: 2px solid;border-left: 1px solid;"><%=malos%></td>
+				</tr>
+				<%
+				rs.MoveNext
+				loop
+		   end if
+		%>
+	</tbody>
+</table>
+<script type="text/javascript">
+	function llenasucursal(nom){
+		var pagina, div, datos,periodo;
+		periodo = $('#tabzonales').attr("data-periodo");
+	    pagina = 'evaluacion_EvaGeneralTablesSucursal.asp';
+		div = 'sucursal';
+		datos=	'periodo='+periodo+'&zonal='+nom;
+		enviaDatos(pagina,div,datos);
+	}
+</script>

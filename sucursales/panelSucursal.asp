@@ -1,0 +1,133 @@
+<div class="well">
+  <!--<span id="tabMenu5" class="mano" data-placement="top" title="Mensajes">
+		<i class="icon-comment-alt icon-2x mano"></i>
+		<span id="numeroMensajes" class="badge badge-info mano">0</span>
+	</span>-->
+  <!--<span id="tabMenu6" class="mano" data-placement="top" title="Incidencias">
+		<i class="icon-flag-alt icon-2x mano"></i>
+		<span id="numeroIncidencias" class="badge badge-info mano">0</span>
+	</span>
+	<span id="tabMenu7" class="mano" data-placement="left" title="Calendario">
+		<i class="icon-calendar icon-2x mano"></i>
+	</span>-->
+  <span
+    id="tabMenu8"
+    class="mano"
+    data-placement="left"
+    title="Encuesta de aseo"
+  >
+    <i class="icon-ticket icon-2x mano"></i>
+  </span>
+  <span
+    id="tabMenu10"
+    class="mano"
+    data-placement="left"
+    title="Asistencia Cajeros"
+  >
+    <i class="icon-user icon-2x mano"></i>
+  </span>
+  <span
+    id="tabMenu11"
+    class="mano"
+    data-placement="left"
+    title="Asistencia Guardias"
+  >
+    <i class="icon-shield icon-2x mano"></i>
+  </span>
+  <span
+    id="tabMenu12"
+    class="mano"
+    data-placement="left"
+    title="Ingreso Dotacion"
+  >
+    <i class="icon-group icon-2x mano"></i>
+  </span>
+  <span
+    id="tabMenu13"
+    class="mano"
+    data-placement="left"
+    title="Solicitudes de Cajeros Adicionales"
+  >
+    <span class="icon-stack icon-2x">
+      <i class="icon-check-empty icon-stack-base"></i>
+      <i class="icon-group"></i>
+    </span>
+  </span>
+  <!--
+	<span id="tabMenu9" class="mano" data-placement="left" title="Salir">
+		<i class="icon-signout icon-2x mano" ></i>
+	</span>-->
+</div>
+<script type="text/javascript">
+  $(function () {
+    $(".mano").tooltip();
+  });
+  var pagina, div, datos;
+  $("#tabMenu5").click(function () {
+    pagina = "mensajes/mensajes.asp";
+    div = "area";
+    datos = "";
+    try {
+      enviaDatos(pagina, div, datos);
+    } catch (err) {}
+  });
+  $("#tabMenu6").click(function () {
+    pagina = "incidencias/muestraIncidencias.asp";
+    div = "area";
+    datos = "";
+    try {
+      enviaDatos(pagina, div, datos);
+    } catch (err) {}
+  });
+  $("#tabMenu7").click(function () {
+    pagina = "calendario/calendario.asp";
+    div = "area";
+    datos = "";
+    try {
+      enviaDatos(pagina, div, datos);
+    } catch (err) {}
+  });
+  $("#tabMenu8").click(function () {
+    pagina = "encuestaAseo/encuesta.asp";
+    div = "area";
+    datos = "";
+    try {
+      enviaDatos(pagina, div, datos);
+    } catch (err) {}
+  });
+  $("#tabMenu9").click(function () {
+    location.href = "verificaUsuario/salir.asp";
+  });
+  $("#tabMenu10").click(function () {
+    pagina = "sucursales/asistenciaSucursalCajeros.asp";
+    div = "area";
+    datos = "";
+    try {
+      enviaDatos(pagina, div, datos);
+    } catch (err) {}
+  });
+  $("#tabMenu11").click(function () {
+    pagina = "sucursales/asistenciaSucursalGuardias.asp";
+    div = "area";
+    datos = "";
+    try {
+      enviaDatos(pagina, div, datos);
+    } catch (err) {}
+  });
+  $("#tabMenu12").click(function () {
+    pagina = "dotacion/dotacion.asp";
+    div = "area";
+    datos = "";
+    try {
+      enviaDatos(pagina, div, datos);
+    } catch (err) {}
+  });
+  $("#tabMenu13").click(function () {
+    pagina = "sucursales/solicitudCajerosAdicionales.asp";
+    div = "area";
+    datos = "";
+    try {
+      enviaDatos(pagina, div, datos);
+    } catch (err) {}
+  });
+</script>

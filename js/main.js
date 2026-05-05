@@ -1,4 +1,4 @@
-﻿var perfil = $('#perfilMain').val();
+var perfil = $('#perfilMain').val();
 $('#verDatos').click(function(){
 	if($(this).hasClass('activaBoton'))
 	{
@@ -24,8 +24,17 @@ $('#tabMenu13CajerosA').click(function(){
 	try{
 	       enviaDatos(pagina,div,datos);
 	}catch(err){}
+});
 
-
+$('#tabMenu13CajerosR').click(function(){
+	sube();
+	$('#gastosIndices').removeClass('oculto');
+	pagina =  'sucursales/solicitudRebajaCajerosAdicionales.asp';
+	div = 'indicesZOnal';
+	datos='';
+	try{
+	       enviaDatos(pagina,div,datos);
+	}catch(err){}
 });
 
 $('#muestraCalendario').click(function(){
@@ -40,7 +49,7 @@ $('#muestraCalendario').click(function(){
 });
 $('#muestraCalendarioZonal').click(function(){
 	pagina = 'visitas/visitaZonal.asp';
-	div = 'indicesZOnal';
+	div = 'trabajoZonal';
 	datos='';
 	try{
 		enviaDatos(pagina,div,datos);

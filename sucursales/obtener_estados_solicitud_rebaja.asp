@@ -10,7 +10,7 @@ perfil = Request.QueryString("perfil")
 estadoActual = Request.QueryString("estado_actual")
 
 Dim sql, rs
-sql = "EXEC SP_SUC_obtener_estados_activos"
+sql = "EXEC SP_SUC_obtener_estados_rebaja_activos"
 
 On Error Resume Next
 Set rs = db.Execute(sql)
@@ -35,29 +35,24 @@ Do While Not rs.EOF
     
     If perfil = "1" Then ' JEPS
         If CInt(estadoActual) = 1 Then 
-            If rs("id_estado") = 2 Then 
+            If rs("id_estado_rebaja") = 2 Then 
                 incluirEstado = True
             End If
         End If
     ElseIf perfil = "2" Then 
         If CInt(estadoActual) = 1 Then 
-            If rs("id_estado") = 3 Or rs("id_estado") = 4 Then 
+            If rs("id_estado_rebaja") = 3 Or rs("id_estado_rebaja") = 4 Then 
                 incluirEstado = True
             End If
         End If
         If CInt(estadoActual) = 3 Then 
-            If rs("id_estado") = 2 Then 
+            If rs("id_estado_rebaja") = 2 Then 
                 incluirEstado = True
             End If
         End If
     ElseIf perfil = "3" Then ' GERENCIA/CENTRAL
-        'If CInt(estadoActual) = 1 Then
-        '    If rs("id_estado") = 5 Or rs("id_estado") = 6 Then 
-        '        incluirEstado = True
-        '    End If
-        'End If
         If CInt(estadoActual) = 3 Then
-            If rs("id_estado") = 5 Or rs("id_estado") = 6 Then 
+            If rs("id_estado_rebaja") = 5 Or rs("id_estado_rebaja") = 6 Then 
                 incluirEstado = True
             End If
         End If
@@ -68,12 +63,12 @@ Do While Not rs.EOF
         primera = False
         
         Response.Write "{"
-        Response.Write """id_estado"":" & rs("id_estado") & ","
-        Response.Write """nombre_estado"":""" & rs("nombre_estado") & ""","
-        Response.Write """descripcion"":""" & Replace(rs("descripcion"), """", "\""") & ""","
-        Response.Write """color_badge"":""" & rs("color_badge") & ""","
-        Response.Write """orden_flujo"":" & rs("orden_flujo") & ","
-        Response.Write """requiere_comentario"":" & IIf(rs("requiere_comentario"), "true", "false")
+        Response.Write """id_estado_rebaja"":" & rs("id_estado_rebaja") & ","
+        Response.Write """nombre_estado_rebaja"":""" & rs("nombre_estado_rebaja") & ""","
+        Response.Write """descripcion_rebaja"":""" & Replace(rs("descripcion_rebaja"), """", "\""") & ""","
+        Response.Write """color_badge_rebaja"":""" & rs("color_badge_rebaja") & ""","
+        Response.Write """orden_flujo_rebaja"":" & rs("orden_flujo_rebaja") & ","
+        Response.Write """requiere_comentario_rebaja"":" & IIf(rs("requiere_comentario_rebaja"), "true", "false")
         Response.Write "}"
     End If
     

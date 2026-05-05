@@ -1,4 +1,4 @@
-﻿<%@LANGUAGE="VBSCRIPT" CODEPAGE="65001"%>
+<%@LANGUAGE="VBSCRIPT" CODEPAGE="65001"%>
 <!--#include file="../conexion/conexion.asp"-->
 <%
 

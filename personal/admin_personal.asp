@@ -72,7 +72,126 @@ horaLimiteReemplazos = obtenerConfiguracion("PERSONAL", "HORA_LIMITE_CARGA_REEMP
     <script type="text/javascript" src="../js/charts.more.js"></script>
     <script type="text/javascript" src="../js/exporta.js"></script>
     <script type="text/javascript" src="../js/jquery.flip.js"></script>
+    <!--script type="text/javascript" src="../js/tocsv.js"></script-->
     <link rel="shortcut icon" href="../ico/favicon.png">
+
+
+<style type="text/css">
+  .icon-capacitacion_preguntas {
+    position: relative; 
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    vertical-align: text-top;
+    top: -1px; /* <-- LÍNEA DESCOMENTADA: Esto lo sube a la misma altura que los demás */
+  }
+
+  .icon-capacitacion_preguntas-lista {
+    font-size: 24px;
+    line-height: 28px;
+    color: inherit;
+  }
+
+</style>
+
+
+<style type="text/css">
+  /* --- Contenedor Principal (Rebaja Cajeros) --- */
+  .icon-solicitud-rebaja-cajeros {
+    position: relative; 
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    vertical-align: text-top;
+    top: -1px; /* <-- LÍNEA DESCOMENTADA: Esto lo sube a la misma altura que los demás */
+  }
+
+  /* --- Icono del Usuario Principal --- */
+  .icon-solicitud-rebaja-cajeros-usuario {
+    font-size: 24px;
+    line-height: 28px;
+    color: inherit;
+  }
+
+  /* --- Contenedor del Badge --- */
+  .icon-solicitud-rebaja-cajeros-badge {
+    position: absolute;
+    right: 1px;  
+    top: -1px;    /* Mantiene el círculo con la 'x' en la parte superior */
+    width: 12px;
+    height: 12px;
+  }
+
+  /* --- El Círculo Negro del Badge --- */
+  .icon-solicitud-rebaja-cajeros-circulo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 12px;
+    line-height: 12px;
+    color: inherit; 
+  }
+
+  /* --- La 'X' Blanca del Badge --- */
+  .icon-solicitud-rebaja-cajeros-flecha {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    font-size: 7px;
+    line-height: 12px;
+    text-align: center;
+    color: #ffffff; 
+    margin: 0;
+  }
+</style>
+
+  <style type="text/css">
+  .icon-solicitud-cajeros {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    vertical-align: text-top;
+    top: -1px;
+  }
+
+  .icon-solicitud-cajeros-usuario {
+    font-size: 24px;
+    line-height: 28px;
+    color: inherit;
+  }
+
+  .icon-solicitud-cajeros-badge {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .icon-solicitud-cajeros-circulo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 12px;
+    line-height: 12px;
+    color: inherit;
+  }
+
+  .icon-solicitud-cajeros-flecha {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    font-size: 7px;
+    line-height: 12px;
+    text-align: center;
+    color: #ffffff;
+    margin: 0;
+  }
+</style>
+
 </head>
 <body topmargin="0">
 <%
@@ -193,6 +312,20 @@ if not rs.eof then
                             <a class="btn btn-success" href="#">
                                 <i class="icon-calendar icon-large"></i>
                                 &nbsp;<span class="bajaLetra"><b>SOLICITUD CAJEROS ADICIONALES</b></span>
+                            </a>
+                        </span>
+                        &nbsp;&nbsp;
+                        <span class="btnSolicitudRebajaCajerosAdicionales" id="btnSolicitudRebajaCajerosAdicionales">
+                            <a class="btn btn-inverse" href="#" style="background-color: #1B3191; border-color: #1B3191; background-image: none;">
+                                <i class="icon-calendar icon-large"></i>
+                                &nbsp;<span class="bajaLetra"><b>SOLICITUD REBAJA CAJEROS ADICIONALES</b></span>
+                            </a>
+                        </span>
+                        &nbsp;&nbsp;
+                        <span class="btnPreguntasCapacitacionCajeros" id="btnPreguntasCapacitacionCajeros">
+                            <a class="btn btn-inverse" href="#" style="background-color: #5d6481; border-color: #5d6481; background-image: none;">
+                                <i class="icon-calendar icon-large"></i>
+                                &nbsp;<span class="bajaLetra"><b>PREGUNTAS CAPACITACION CAJEROS</b></span>
                             </a>
                         </span>
                         &nbsp;&nbsp;
@@ -905,6 +1038,8 @@ $('.btnSolicitudCajerosAdicionales').click(function(){
     $('.btnCuadroDeControl2').addClass('oculto');
     $('.btnGestionProveedores').addClass('oculto');
     $('.btnSolicitudCajerosAdicionales').addClass('oculto');
+    $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
+    $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
     $('.dvTbSolicitudCajerosAdicionales').removeClass('oculto');
     $('.btnVolverAdmini5').removeClass('oculto');
     $('#Central_Columna_mensual').addClass('oculto');
@@ -913,6 +1048,58 @@ $('.btnSolicitudCajerosAdicionales').click(function(){
     var div = 'tbSolicitudCajerosAdicionales';
     var datos = '';
     var pagina = '../sucursales/solicitudCajerosAdicionales.asp';
+    var perfilSimulado = '3'; // Simular perfil 3
+    var idSucursalMain = '0'; // 0 para que muestre todas las sucursales
+    var idUsuarioMain = '<%=usuarioLog%>';
+    
+    datos = 'idSucursalMain=' + idSucursalMain + '&perfilMain=' + perfilSimulado + '&idUsuarioMain=' + idUsuarioMain;
+    enviaDatos(pagina, div, datos);
+});
+
+$('.btnSolicitudRebajaCajerosAdicionales').click(function(){
+    $('.btnGestionCasos').addClass('oculto');
+    $('.btnCuadroDeControl').addClass('oculto');
+    $('.btnCuadroDeControl2').addClass('oculto');
+    $('.btnGestionProveedores').addClass('oculto');
+    $('.btnSolicitudCajerosAdicionales').addClass('oculto');
+    $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
+    $('.dvTbSolicitudCajerosAdicionales').removeClass('oculto');
+    $('.btnVolverAdmini5').removeClass('oculto');
+    $('#Central_Columna_mensual').addClass('oculto');
+    $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('#tbSolicitudCajerosAdicionales').html('');
+    var div = 'tbSolicitudCajerosAdicionales';
+    var datos = '';
+    var pagina = '../sucursales/solicitudRebajaCajerosAdicionales.asp';
+    var perfilSimulado = '3'; // Simular perfil 3
+    var idSucursalMain = '0'; // 0 para que muestre todas las sucursales
+    var idUsuarioMain = '<%=usuarioLog%>';
+    
+    datos = 'idSucursalMain=' + idSucursalMain + '&perfilMain=' + perfilSimulado + '&idUsuarioMain=' + idUsuarioMain;
+    enviaDatos(pagina, div, datos);
+});
+
+
+$('.btnPreguntasCapacitacionCajeros').click(function(){
+    $('.btnGestionCasos').addClass('oculto');
+    $('.btnCuadroDeControl').addClass('oculto');
+    $('.btnCuadroDeControl2').addClass('oculto');
+    $('.btnGestionProveedores').addClass('oculto');
+    $('.btnSolicitudCajerosAdicionales').addClass('oculto');
+    $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
+    $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('.dvTbSolicitudCajerosAdicionales').removeClass('oculto');
+    $('.btnVolverAdmini5').removeClass('oculto');
+    $('#Central_Columna_mensual').addClass('oculto');
+
+
+
+    
+    
+    $('#tbSolicitudCajerosAdicionales').html('');
+    var div = 'tbSolicitudCajerosAdicionales';
+    var datos = '';
+    var pagina = '../sucursales/capacitacion_preguntas.asp';
     var perfilSimulado = '3'; // Simular perfil 3
     var idSucursalMain = '0'; // 0 para que muestre todas las sucursales
     var idUsuarioMain = '<%=usuarioLog%>';
@@ -1270,8 +1457,9 @@ $(function () {
 	var funcionalidad = $('#funcionalidad_log').val();
 	var tipoAccion = $('#tipo_accion_log').val();
 	
-	var url = 'exportar_logs_excel.asp?fecha_desde=' + fechaDesde + '&fecha_hasta=' + fechaHasta + '&usuario=' + encodeURIComponent(usuario) + '&perfil=' + encodeURIComponent(perfil) + '&funcionalidad=' + encodeURIComponent(funcionalidad) + '&tipo_accion=' + encodeURIComponent(tipoAccion);
-	
+//	var url = 'exportar_logs_excel.asp?fecha_desde=' + fechaDesde + '&fecha_hasta=' + fechaHasta + '&usuario=' + encodeURIComponent(usuario) + '&perfil=' + encodeURIComponent(perfil) + '&funcionalidad=' + encodeURIComponent(funcionalidad) + '&tipo_accion=' + encodeURIComponent(tipoAccion);
+//  tocsv('lst_logs_resultado', 'reporte_log.csv', -1);
+	var url = 'exportar_logs_csv.asp?fecha_desde=' + fechaDesde + '&fecha_hasta=' + fechaHasta + '&usuario=' + encodeURIComponent(usuario) + '&perfil=' + encodeURIComponent(perfil) + '&funcionalidad=' + encodeURIComponent(funcionalidad) + '&tipo_accion=' + encodeURIComponent(tipoAccion);
 	window.open(url, '_blank');
 });
 

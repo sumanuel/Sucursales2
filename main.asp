@@ -58,6 +58,104 @@ else%>
   <script type="text/javascript" src="../cdn/js/jquery.dataTables10.min.js"></script>
   <script type="text/javascript" src="../cdn/js/jquery.dataTables.bootstrap.js"></script>
   <script type="text/javascript" src="../cdn/js/jquery.prettynumber.js"/></script>
+  
+  <style type="text/css">
+  /* --- Contenedor Principal (Rebaja Cajeros) --- */
+  .icon-solicitud-rebaja-cajeros {
+    position: relative; 
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    vertical-align: text-top;
+    top: -11px; /* <-- LÍNEA DESCOMENTADA: Esto lo sube a la misma altura que los demás */
+  }
+
+  /* --- Icono del Usuario Principal --- */
+  .icon-solicitud-rebaja-cajeros-usuario {
+    font-size: 24px;
+    line-height: 28px;
+    color: inherit;
+  }
+
+  /* --- Contenedor del Badge --- */
+  .icon-solicitud-rebaja-cajeros-badge {
+    position: absolute;
+    right: 1px;  
+    top: -1px;    /* Mantiene el círculo con la 'x' en la parte superior */
+    width: 12px;
+    height: 12px;
+  }
+
+  /* --- El Círculo Negro del Badge --- */
+  .icon-solicitud-rebaja-cajeros-circulo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 12px;
+    line-height: 12px;
+    color: inherit; 
+  }
+
+  /* --- La 'X' Blanca del Badge --- */
+  .icon-solicitud-rebaja-cajeros-flecha {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    font-size: 7px;
+    line-height: 12px;
+    text-align: center;
+    color: #ffffff; 
+    margin: 0;
+  }
+</style>
+
+  <style type="text/css">
+  .icon-solicitud-cajeros {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    vertical-align: text-top;
+    top: -11px;
+  }
+
+  .icon-solicitud-cajeros-usuario {
+    font-size: 24px;
+    line-height: 28px;
+    color: inherit;
+  }
+
+  .icon-solicitud-cajeros-badge {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .icon-solicitud-cajeros-circulo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 12px;
+    line-height: 12px;
+    color: inherit;
+  }
+
+  .icon-solicitud-cajeros-flecha {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    font-size: 7px;
+    line-height: 12px;
+    text-align: center;
+    color: #ffffff;
+    margin: 0;
+  }
+</style>
+
 </head>
 <body>
 <form id="valores" name="valores" action="main.asp" method="post">
@@ -125,11 +223,32 @@ else%>
         <span id="muestraGraficoZonal" class="muestraGraficoZonal mano" data-placement="top" data-original-title="Tendencias">
           <i class="icon-bar-chart icon-2x mano ayuda" ></i>
         </span>
-        <!--Jesús-->
+        <!--Jes�s-->
         <span id="tabMenu13CajerosA" class="mano" title="Solicitudes de Cajeros Adicionales">
-          <span class="icon-stack icon-2x">
+          <!--span class="icon-stack icon-2x">
             <i class="icon-check-empty icon-stack-base"></i>
             <i class="icon-group"></i>
+          </span-->
+          <span class="icon-solicitud-cajeros">
+            <i class="icon-user icon-solicitud-cajeros-usuario"></i>
+            <span class="icon-solicitud-cajeros-badge">
+              <i class="icon-circle icon-solicitud-cajeros-circulo"></i>
+              <i class="icon-arrow-down icon-solicitud-cajeros-flecha"></i>
+            </span>
+          </span>
+        </span>
+        
+        <span id="tabMenu13CajerosR" class="mano" title="Solicitudes de Rebaja Cajeros Adicionales">
+          <!--span class="icon-stack icon-2x">
+            <i class="icon-check-empty icon-stack-base"></i>
+            <i class="icon-group"></i>
+          </span-->
+          <span class="icon-solicitud-rebaja-cajeros">
+            <i class="icon-user icon-solicitud-rebaja-cajeros-usuario"></i>
+            <span class="icon-solicitud-rebaja-cajeros-badge">
+              <i class="icon-circle icon-solicitud-rebaja-cajeros-circulo"></i>
+              <i class="icon-arrow-up icon-solicitud-rebaja-cajeros-flecha"></i>
+            </span>
           </span>
         </span>
         <!--<span id="botonSalirZonal" class="mano">
@@ -342,6 +461,7 @@ else%>
   </div>-->
 </div>
 <script src="js/main.js" type="text/javascript"></script>
+<!-- <script src="js/tocsv.js" type="text/javascript"></script> -->
 <script>
 //Highcharts.setOptions({lang: {decimalPoint: ',',thousandsSep: '.'},tooltip: {yDecimals: 2}});
 $(function() {

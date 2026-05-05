@@ -3,7 +3,7 @@
 <%
 Response.Buffer = TRUE
 Response.ContentType = "application/vnd.ms-excel"
-Response.AddHeader "Content-Disposition", "attachment; filename=reporte_logs_" & Replace(Date(), "/", "-") & ".xls"
+Response.AddHeader "Content-Disposition", "attachment; filename=cajeros_adicionales_" & Replace(Date(), "/", "-") & ".xls"
 
 'Obtener parámetros de búsqueda
 dim fechaDesde, fechaHasta, usuario, perfil, funcionalidad, tipoAccion
@@ -57,6 +57,27 @@ end if
 
 'Ejecutar consulta
 on error resume next
+
+sql = "SELECT " & _
+      "s.id_solicitud, s.id_sucursal, suc.suc_nombre, s.motivo_solicitud, " & _
+      "CASE s.motivo_solicitud " & _
+      "  WHEN 'licencia_medica' THEN 'Licencia Médica' " & _
+      "  WHEN 'vacaciones' THEN 'Vacaciones' " & _
+      "  WHEN 'reemplazo' THEN 'Reemplazo' " & _
+      "  WHEN 'flujo' THEN 'Flujo' " & _
+      "  ELSE s.motivo_solicitud " & _
+      "END AS motivo_solicitud_texto, " & _
+      "FORMAT(s.fecha_desde, 'dd/MM/yyyy') AS fecha_desde, " & _
+      "FORMAT(s.fecha_hasta, 'dd/MM/yyyy') AS fecha_hasta, " & _
+      "s.periodo, s.observaciones, " & _
+      "s.id_estado, e.nombre_estado, e.color_badge, " & _
+      "s.usuario_registro, FORMAT(s.fecha_registro, 'dd/MM/yyyy') AS fecha_registro " & _
+      "FROM SUC_solicitud_cajeros_adicionales s " & _
+      "LEFT JOIN SUC_sucursal suc ON s.id_sucursal = suc.id_sucursal " & _
+      "LEFT JOIN SUC_cat_estados_solicitud e ON s.id_estado = e.id_estado " & _
+      whereClause & _
+      "ORDER BY s.fecha_registro DESC " & _
+
 set rsLogs = DB.execute(sql).NextRecordset
 
 if err.number <> 0 then

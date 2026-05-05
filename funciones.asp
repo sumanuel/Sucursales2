@@ -443,7 +443,7 @@ function obtieneIdSucursal(idUsuario)
 	obtieneIdSucursal = idSucursal
 end function
 
-'FunciÃ³n para registrar log de eventos del usuario
+'Función para registrar log de eventos del usuario
 sub registrarLog(usuario, perfil, funcionalidad, tipo_accion)
 	on error resume next
 	

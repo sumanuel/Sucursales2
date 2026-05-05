@@ -1,4 +1,4 @@
-﻿<%idSucursal=trim(request("idSucursalMain"))
+<%idSucursal=trim(request("idSucursalMain"))
 if idSucursal = "0" then
   idSucursal = trim(request("idSucursal"))
 end if
@@ -86,7 +86,7 @@ $('#muestraIndicesGrafico').click(function(){
 	return false;
 });
 $('#muestraAsistenciaCajeros').click(function(){
-alert('Algo Salio Mal.');		
+
 	idSucursal = $(this).attr('data-idSucursal');
 	//pagina = 'sucursales/asistenciaSucursalCajeros_ver.asp';
 	pagina = 'sucursales/asistenciaSucursalCajeros_zonal.asp';

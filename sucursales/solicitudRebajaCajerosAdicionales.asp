@@ -16,6 +16,12 @@ if idSucursal="" and perfil <> "3" then
     </div>
 <%else
 
+sqlMotivos = "SELECT id_motivo_rebaja, nombre_motivo_rebaja FROM SUC_cat_motivo_solicitud_rebaja"
+Set rsMotivos = DB.execute(sqlMotivos)
+If Not rsMotivos.EOF Then
+    datosMotivos = rsMotivos.GetRows()
+End If
+
 ' Consulta para obtener lista de sucursales segÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºn perfil
 If perfil = "1" Then
     sqlSucursales = ""
@@ -64,49 +70,76 @@ If Not rsPeriodos.EOF Then
     datosPeriodos = rsPeriodos.getrows()
 End If
 
-' Consulta de solicitudes de cajeros adicionales
+' Consulta de solicitudes de rebaja cajeros adicionales
 If perfil = "2" Then
     ' Para ZONAL, obtener todas las solicitudes de sus sucursales
-    sqlSolicitudes = "SELECT " & _
-                    "s.id_solicitud, s.id_sucursal, suc.suc_nombre, s.motivo_solicitud, " & _
-                    "CASE s.motivo_solicitud " & _
-                    "  WHEN 'licencia_medica' THEN 'Licencia Médica' " & _
-                    "  WHEN 'vacaciones' THEN 'Vacaciones' " & _
-                    "  WHEN 'reemplazo' THEN 'Reemplazo' " & _
-                    "  WHEN 'flujo' THEN 'Flujo' " & _
-                    "  ELSE s.motivo_solicitud " & _
-                    "END AS motivo_solicitud_texto, " & _
-                    "FORMAT(s.fecha_desde, 'dd/MM/yyyy') AS fecha_desde, FORMAT(s.fecha_hasta, 'dd/MM/yyyy') AS fecha_hasta, s.periodo, s.observaciones, " & _
-                    "s.id_estado, e.nombre_estado, e.color_badge, " & _
-                    "s.usuario_registro, FORMAT(s.fecha_registro, 'dd/MM/yyyy') AS fecha_registro " & _
-                    "FROM SUC_solicitud_cajeros_adicionales s " & _
-                    "LEFT JOIN SUC_sucursal suc ON s.id_sucursal = suc.id_sucursal " & _
-                    "LEFT JOIN SUC_cat_estados_solicitud e ON s.id_estado = e.id_estado " & _
-                    "WHERE s.activo = 1 " & _
+'    sqlSolicitudes = "SELECT " & _
+'                    "s.id_solicitud, s.id_sucursal, suc.suc_nombre, s.motivo_solicitud, " & _
+'                    "CASE s.motivo_solicitud " & _
+'                    "  WHEN 'licencia_medica' THEN 'Licencia Médica' " & _
+'                    "  WHEN 'vacaciones' THEN 'Vacaciones' " & _
+'                    "  WHEN 'reemplazo' THEN 'Reemplazo' " & _
+'                    "  WHEN 'flujo' THEN 'Flujo' " & _
+'                    "  ELSE s.motivo_solicitud " & _
+'                    "END AS motivo_solicitud_texto, " & _
+'                    "FORMAT(s.fecha_desde, 'dd/MM/yyyy') AS fecha_desde, FORMAT(s.fecha_hasta, 'dd/MM/yyyy') AS fecha_hasta, s.periodo, s.observaciones, " & _
+'                    "s.id_estado, e.nombre_estado, e.color_badge, " & _
+'                    "s.usuario_registro, FORMAT(s.fecha_registro, 'dd/MM/yyyy') AS fecha_registro " & _
+'                    "FROM SUC_solicitud_cajeros_adicionales s " & _
+'                    "LEFT JOIN SUC_sucursal suc ON s.id_sucursal = suc.id_sucursal " & _
+'                    "LEFT JOIN SUC_cat_estados_solicitud e ON s.id_estado = e.id_estado " & _
+'                    "WHERE s.activo = 1 " & _
+'                    "AND s.id_sucursal IN (SELECT id_sucursal FROM SUC_usuario_sucursal WHERE id_usuario = " & idUsuario & ") " & _
+'                    "ORDER BY s.fecha_registro DESC"
+
+    sqlSolicitudes = "SELECT  " & _
+                    "s.id_solicitud_rebaja, s.id_sucursal, suc.suc_nombre, s.motivo_solicitud_rebaja,  " & _
+                    "mr.nombre_motivo_rebaja AS motivo_solicitud_texto,  " & _
+                    "s.observaciones,  " & _
+                    "s.id_estado_rebaja, e.nombre_estado_rebaja, e.color_badge_rebaja,  " & _
+                    "s.usuario_registro, FORMAT(s.fecha_registro, 'dd/MM/yyyy') AS fecha_registro  " & _
+                    "FROM SUC_solicitud_cajeros_adicionales_rebaja s  " & _
+                    "LEFT JOIN SUC_sucursal suc ON s.id_sucursal = suc.id_sucursal  " & _
+                    "LEFT JOIN SUC_cat_estados_solicitud_rebaja e ON s.id_estado_rebaja = e.id_estado_rebaja  " & _
+                    "JOIN SUC_cat_motivo_solicitud_rebaja mr on mr.id_motivo_rebaja = s.motivo_solicitud_rebaja " & _
+                    "WHERE s.activo = 1  " & _
                     "AND s.id_sucursal IN (SELECT id_sucursal FROM SUC_usuario_sucursal WHERE id_usuario = " & idUsuario & ") " & _
-                    "ORDER BY s.fecha_registro DESC"
+                    "ORDER BY s.fecha_registro DESC  " 
 ElseIf perfil = "3" Then
     ' Para ADMIN/CENTRAL, mostrar todas las solicitudes sin importar idSucursal
-    sqlSolicitudes = "SELECT " & _
-                    "s.id_solicitud, s.id_sucursal, suc.suc_nombre, s.motivo_solicitud, " & _
-                    "CASE s.motivo_solicitud " & _
-                    "  WHEN 'licencia_medica' THEN 'Licencia Médica' " & _
-                    "  WHEN 'vacaciones' THEN 'Vacaciones' " & _
-                    "  WHEN 'reemplazo' THEN 'Reemplazo' " & _
-                    "  WHEN 'flujo' THEN 'Flujo' " & _
-                    "  ELSE s.motivo_solicitud " & _
-                    "END AS motivo_solicitud_texto, " & _
-                    "FORMAT(s.fecha_desde, 'dd/MM/yyyy') AS fecha_desde, FORMAT(s.fecha_hasta, 'dd/MM/yyyy') AS fecha_hasta, s.periodo, s.observaciones, " & _
-                    "s.id_estado, e.nombre_estado, e.color_badge, " & _
-                    "s.usuario_registro, FORMAT(s.fecha_registro, 'dd/MM/yyyy') AS fecha_registro " & _
-                    "FROM SUC_solicitud_cajeros_adicionales s " & _
-                    "LEFT JOIN SUC_sucursal suc ON s.id_sucursal = suc.id_sucursal " & _
-                    "LEFT JOIN SUC_cat_estados_solicitud e ON s.id_estado = e.id_estado " & _
-                    "WHERE s.activo = 1 " & _
-                    "ORDER BY s.fecha_registro DESC"
+'    sqlSolicitudes = "SELECT " & _
+'                    "s.id_solicitud, s.id_sucursal, suc.suc_nombre, s.motivo_solicitud, " & _
+'                    "CASE s.motivo_solicitud " & _
+'                    "  WHEN 'licencia_medica' THEN 'Licencia Médica' " & _
+'                    "  WHEN 'vacaciones' THEN 'Vacaciones' " & _
+'                    "  WHEN 'reemplazo' THEN 'Reemplazo' " & _
+'                    "  WHEN 'flujo' THEN 'Flujo' " & _
+'                    "  ELSE s.motivo_solicitud " & _
+'                    "END AS motivo_solicitud_texto, " & _
+'                    "FORMAT(s.fecha_desde, 'dd/MM/yyyy') AS fecha_desde, FORMAT(s.fecha_hasta, 'dd/MM/yyyy') AS fecha_hasta, s.periodo, s.observaciones, " & _
+'                    "s.id_estado, e.nombre_estado, e.color_badge, " & _
+'                    "s.usuario_registro, FORMAT(s.fecha_registro, 'dd/MM/yyyy') AS fecha_registro " & _
+'                    "FROM SUC_solicitud_cajeros_adicionales s " & _
+'                    "LEFT JOIN SUC_sucursal suc ON s.id_sucursal = suc.id_sucursal " & _
+'                    "LEFT JOIN SUC_cat_estados_solicitud e ON s.id_estado = e.id_estado " & _
+'                    "WHERE s.activo = 1 " & _
+'                    "ORDER BY s.fecha_registro DESC"
+
+    sqlSolicitudes = "SELECT  " & _
+                    "s.id_solicitud_rebaja, s.id_sucursal, suc.suc_nombre, s.motivo_solicitud_rebaja,  " & _
+                    "mr.nombre_motivo_rebaja AS motivo_solicitud_texto,  " & _
+                    "s.observaciones,  " & _
+                    "s.id_estado_rebaja, e.nombre_estado_rebaja, e.color_badge_rebaja,  " & _
+                    "s.usuario_registro, FORMAT(s.fecha_registro, 'dd/MM/yyyy') AS fecha_registro  " & _
+                    "FROM SUC_solicitud_cajeros_adicionales_rebaja s  " & _
+                    "LEFT JOIN SUC_sucursal suc ON s.id_sucursal = suc.id_sucursal  " & _
+                    "LEFT JOIN SUC_cat_estados_solicitud_rebaja e ON s.id_estado_rebaja = e.id_estado_rebaja  " & _
+                    "JOIN SUC_cat_motivo_solicitud_rebaja mr on mr.id_motivo_rebaja = s.motivo_solicitud_rebaja " & _
+                    "WHERE s.activo = 1  " & _
+                    "ORDER BY s.fecha_registro DESC  " 
 Else
     ' Para otros perfiles, solo su sucursal
-    sqlSolicitudes = "EXEC SP_SUC_listar_solicitudes_cajeros @id_sucursal=" & idSucursal
+    sqlSolicitudes = "EXEC SP_SUC_listar_solicitudes_cajeros_rebaja @id_sucursal=" & idSucursal
 End If
 Set rsSolicitudes = DB.execute(sqlSolicitudes)
 
@@ -122,12 +155,12 @@ fechaHoy = fechaHoy & Day(Date)
 <script type="text/javascript">
 
 // Guardar cambio de estado
-$('#btnExportarExcelModal').on('click', function(){
+$('#btnExportarExcelRebajaModal').on('click', function(){
 
-        var fechaDesde = $('#fecha_desde_sol').val();
-        var fechaHasta = $('#fecha_hasta_sol').val();
+        var fechaDesde = $('#fecha_desde_sol_rebaja').val();
+        var fechaHasta = $('#fecha_hasta_sol_rebaja').val();
 
-        var url = '../sucursales/solicitudCajerosAdicionales_csv.asp?fechaDesdeSol=' + fechaDesde + '&fechaHastaSol=' + fechaHasta;
+        var url = '../sucursales/solicitudRebajaCajerosAdicionales_csv.asp?fechaDesdeSol_rebaja=' + fechaDesde + '&fechaHastaSol_rebaja=' + fechaHasta;
         window.open(url, '_blank');
         $('#modalExportarExcel').modal('hide');
 
@@ -142,15 +175,16 @@ $('#btnExportarExcelModal').on('click', function(){
                 <h4>
                     <span id="loadIcon" style="display:none;">
                         <i class="icon-spinner icon-spin icon-large"></i>
-                    </span> 
-                    <span class="icon-solicitud-cajeros ">
-                        <i class="icon-user icon-solicitud-cajeros-usuario"></i>
-                        <span class="icon-solicitud-cajeros-badge">
-                            <i class="icon-circle icon-solicitud-cajeros-circulo"></i>
-                            <i class="icon-arrow-down icon-solicitud-cajeros-flecha"></i>
+                    </span>
+                    <span class="icon-solicitud-rebaja-cajeros ">
+                        <i class="icon-user icon-solicitud-rebaja-cajeros-usuario" ></i>
+                        <span class="icon-solicitud-rebaja-cajeros-badge">
+                            <i class="icon-circle icon-solicitud-rebaja-cajeros-circulo"></i>
+                            <i class="icon-arrow-up icon-solicitud-rebaja-cajeros-flecha"></i>
                         </span>
                     </span>
-                    Solicitud Cajeros Adicionales
+                    
+                    Solicitud Rebaja Cajeros Adicionales
                 </h4>
             </strong>
         </span>        
@@ -158,7 +192,7 @@ $('#btnExportarExcelModal').on('click', function(){
             <%
                 If perfil = "3" Then
             %>
-                <a class="btn btn-warning btn btnExportarExcel" id="btnExportarExcel">
+                <a class="btn btn-warning btn btnExportarExcelRebaja" id="btnExportarExcelRebaja">
                     <i class="icon-cloud-download icon"></i>
                     &nbsp;<span class="bajaLetra"><b>EXPORTAR A EXCEL</b></span>
                 </a>
@@ -168,20 +202,18 @@ $('#btnExportarExcelModal').on('click', function(){
     <% If perfil <> "3" Then %>
     <div class="row-fluid">
     	<div class="span12">
-            <button class="btn btn-success" id="btnCrearSolicitud">
+            <button class="btn btn-success" id="btnCrearSolicitudRebaja">
                 <i class="icon-plus icon-white"></i> Crear Solicitud
             </button>
         </div>
     </div>   
 
     <script type="text/javascript">
-    	$('#btnCrearSolicitud').click(function(){
-			$('#formsIng').fadeIn('slow');
-            //$('#txt_obligatorio').css('display', 'none');
+    	$('#btnCrearSolicitudRebaja').click(function(){
+            $('#formsIng').fadeIn('slow');
             $('#txt_obligatorio').css('display', 'inline');
             $('#txt_obligatorio').css('color', 'red');
             $('#hidden_modo').prop('value', 'NEW');
-
 
             <% If perfil = "2" Then %>
                 $('#slc_sucursal').prop('disabled', false).css('background-color', '');
@@ -189,21 +221,16 @@ $('#btnExportarExcelModal').on('click', function(){
                     $('#slc_sucursal').prop('disabled', true).css('background-color', '#f5f5f5');
             <% End If %>
 
-
-
-
-
-
-		});
+    });
     </script>
     <% End If %>
     <br/>
 
     <div class="row-fluid">
     	<div class="span12 well" id="formsIng" style="display:none;">
-            <h5>Solicitud de Cajero Adicional</h5>
-            <form id="formSolicitudCajero">
-                <input type="hidden" id="id_solicitud" name="id_solicitud" value="0" />
+            <h5>Solicitud Rebaja Cajeros Adicionales</h5>
+            <form id="formSolicitudRebajaCajero">
+                <input type="hidden" id="id_solicitud_rebaja" name="id_solicitud_rebaja" value="0" />
                 <input type="hidden" id="id_sucursal_hidden" name="id_sucursal_hidden" value="<%=idSucursal%>" />
                 <input type="hidden" id="hidden_modo" name="hidden_modo" value=""/>
                 
@@ -220,7 +247,7 @@ $('#btnExportarExcelModal').on('click', function(){
                                     seleccionado = ""
                                     If CStr(idSuc) = CStr(idSucursal) Then seleccionado = "selected"
                             %>
-                                    <option value="<%=idSuc%>" <%=seleccionado%>><%=nombreSuc%></option>
+                                    <option <%=seleccionado%> value="<%=idSuc%>"><%=nombreSuc%></option>
                             <%
                                 Next
                             End If
@@ -230,26 +257,31 @@ $('#btnExportarExcelModal').on('click', function(){
                     <div class="span6">
                         <label><strong>Motivo Solicitud: <span style="color:red;">*</span></strong></label>
                         <select id="slc_motivo" name="slc_motivo" class="span12" required <% If perfil = "3" Then %>disabled style="background-color:#f5f5f5;"<% End If %>>
-                            <option value="">Seleccione...</option>
-                            <option value="licencia_medica">Licencia Médica</option>
-                            <option value="vacaciones">Vacaciones</option>
-                            <option value="reemplazo">Reemplazo</option>
-                            <option value="flujo">Flujo</option>
+                            <option value="">Seleccione motivo...</option>
+                            <%
+                            If IsArray(datosMotivos) Then
+                                For i = 0 To UBound(datosMotivos, 2)
+                                    id_motivo_rebaja = Trim(datosMotivos(0, i))
+                                    nombre_motivo_rebaja = Server.HTMLEncode(Trim(datosMotivos(1, i)))
+                                    seleccionado = ""
+                            %>
+                                    <option value="<%=id_motivo_rebaja%>" <%=seleccionado%>><%=nombre_motivo_rebaja%></option>
+                            <%
+                                Next
+                            End If
+                            %>
                         </select>
                     </div>
-                </div>
-                
-                <div class="row-fluid">
-                    <div class="span6">
-                        <label><strong>Desde: <span style="color:red;">*</span></strong></label>
-                        <input type="date" id="fecha_desde" name="fecha_desde" class="span12" value="<%=fechaHoy%>" required />
+                    <div class="row-fluid">
+                        <div class="span6">
+                            <label><strong>Desde: <span style="color:red;">*</span></strong></label>
+                            <input type="date" id="fecha_desde" name="fecha_desde" class="span12" value="<%=fechaHoy%>" required />
+                        </div>
+                        <div class="span6">
+                            <label><strong>Hasta: <span style="color:red;">*</span></strong></label>
+                            <input type="date" id="fecha_hasta" name="fecha_hasta" class="span12" value="<%=fechaHoy%>" required />
+                        </div>
                     </div>
-                    <div class="span6">
-                        <label><strong>Hasta: <span style="color:red;">*</span></strong></label>
-                        <input type="date" id="fecha_hasta" name="fecha_hasta" class="span12" value="<%=fechaHoy%>" required />
-                    </div>
-                </div>
-                
                 <div class="row-fluid" style="display:none;">
                     <div class="span6">
                         <label><strong>Periodo: <span style="color:red;">*</span></strong></label>
@@ -272,14 +304,12 @@ $('#btnExportarExcelModal').on('click', function(){
                         </select>
                     </div>
                 </div>
-                
                 <div class="row-fluid">
                     <div class="span12">
                         <label><strong>Observaciones:</strong><span id="txt_obligatorio">*</span> <small>(Máximo 50 caracteres)</small></label>
-                        <textarea id="txt_observaciones" name="txt_observaciones" class="span12" rows="3" maxlength="50" <% If perfil = "3" Then %>readonly style="background-color:#f5f5f5;"<% End If %>></textarea>
+                        <textarea id="txt_observaciones" name="txt_observaciones" class="span12" rows="3" maxlength="50" ></textarea>
                     </div>
                 </div>
-                
                 <div class="row-fluid">
                     <div class="span12" style="text-align:right; margin-top:10px;">
                         <button type="button" class="btn" id="btnCancelarSolicitud">
@@ -295,29 +325,27 @@ $('#btnExportarExcelModal').on('click', function(){
             <script type="text/javascript">
                 // Cancelar formulario
                 $('#btnCancelarSolicitud').click(function(){
-                    $('#formSolicitudCajero')[0].reset();
-                    $('#id_solicitud').val(''); // Limpiar el ID para que sea nueva solicitud
+                    $('#formSolicitudRebajaCajero')[0].reset();
+                    $('#id_solicitud_rebaja').val(''); // Limpiar el ID para que sea nueva solicitud
                     // Restaurar la sucursal seleccionada originalmente
                     $('#slc_sucursal').val($('#idSucursal').val());
                     <% If perfil <> "3" Then %>
-                    // Rehabilitar campos al cancelar
-                    $('#slc_sucursal').prop('disabled', false).css('background-color', '');
-                    $('#slc_motivo').prop('disabled', false).css('background-color', '');
-                    $('#txt_observaciones').prop('readonly', false).css('background-color', '');
+                        // Rehabilitar campos al cancelar
+                        //$('#slc_sucursal').prop('disabled', false).css('background-color', '');
+                        $('#slc_motivo').prop('disabled', false).css('background-color', '');
+                        $('#txt_observaciones').prop('readonly', false).css('background-color', '');
                     <% End If %>
                     $('#formsIng').fadeOut('fast');
                 });
                 
                 // Guardar solicitud
-                $('#formSolicitudCajero').submit(function(e){
+                $('#formSolicitudRebajaCajero').submit(function(e){
                     e.preventDefault();
-                    
                     // Validar que la sucursal esté seleccionada
                     if($('#slc_sucursal').val() === ''){
                         alert('Por favor seleccione una sucursal');
                         return false;
                     }
-
                     // Modo edita observacion obligatoria 
                     if($('#hidden_modo').val() === 'EDIT' || $('#hidden_modo').val() === 'NEW'){
                         if($('#txt_observaciones').val() === ''){
@@ -325,9 +353,6 @@ $('#btnExportarExcelModal').on('click', function(){
                             return false;
                         }
                     }
-
-
-
                     // Calcular periodo automáticamente desde la fecha_desde (formato YYYY - MES)
                     var fechaDesde = $('#fecha_desde').val(); // formato YYYY-MM-DD
                     var periodo = '';
@@ -342,7 +367,7 @@ $('#btnExportarExcelModal').on('click', function(){
                     }
                     
                     var datos = {
-                        id_solicitud: $('#id_solicitud').val(),
+                        id_solicitud_rebaja: $('#id_solicitud_rebaja').val(),
                         id_sucursal: $('#slc_sucursal').val(),
                         motivo: $('#slc_motivo').val(),
                         fecha_desde: $('#fecha_desde').val(),
@@ -355,11 +380,11 @@ $('#btnExportarExcelModal').on('click', function(){
                     console.log('Periodo calculado:', periodo);
                     console.log('Enviando datos:', datos);
 
-		var url_ajax='../sucursales/guardar_solicitud_cajero.asp';
-                <% If perfil <> "3" Then %>
-		url_ajax='sucursales/guardar_solicitud_cajero.asp';
-                <% End If %>
-                    
+		            var url_ajax='../sucursales/guardar_solicitud_rebaja_cajero.asp';
+                    <% If perfil <> "3" Then %>
+		                url_ajax='sucursales/guardar_solicitud_rebaja_cajero.asp';
+                    <% End If %>
+
                     $.ajax({
                         type: 'POST',
                         url: url_ajax,
@@ -372,16 +397,16 @@ $('#btnExportarExcelModal').on('click', function(){
                                 console.log('JSON parseado:', response);
                                 if(response.resultado === 'OK'){
                                     alert('Solicitud guardada correctamente');
-                                    $('#formSolicitudCajero')[0].reset();
-                                    $('#id_solicitud').val(''); // Limpiar el ID
+                                    $('#formSolicitudRebajaCajero')[0].reset();
+                                    $('#id_solicitud_rebaja').val(''); // Limpiar el ID
                                     $('#slc_sucursal').val($('#idSucursal').val()); // Restaurar sucursal
                                     $('#formsIng').fadeOut('fast');
                                     // Recargar solo la tabla sin refresh completo
                                     cargarTablaSolicitudesPaginada(1);
                                     
                                     // Registrar log
-                                    var accion = datos.id_solicitud == '0' ? 'Crear solicitud cajero adicional' : 'Editar solicitud cajero adicional';
-                                    registrarLog('Solicitud Cajeros Adicionales', accion);
+                                    var accion = datos.id_solicitud_rebaja == '0' ? 'Crear solicitud rebaja cajero adicional' : 'Editar solicitud rebaja cajero adicional';
+                                    registrarLog('Solicitud Rebaja Cajeros Adicionales', accion);
                                 } else {
                                     alert('Alerta: ' + response.mensaje);
                                 }
@@ -452,9 +477,9 @@ $('#btnExportarExcelModal').on('click', function(){
                 // Editar solicitud con delegación de eventos
                 $(document).on('click', '.btnEditarSolicitud', function(){
                     var id = $(this).data('id');
-                    var url_ajax='../sucursales/obtener_solicitud_cajero.asp?id_solicitud=' + id;
+                    var url_ajax='../sucursales/obtener_solicitud_cajero_rebaja.asp?id_solicitud_rebaja=' + id;
                     <% If perfil <> "3" Then %>
-                        url_ajax='sucursales/obtener_solicitud_cajero.asp?id_solicitud=' + id;
+                        url_ajax='sucursales/obtener_solicitud_cajero_rebaja.asp?id_solicitud_rebaja=' + id;
                     <% End If %>
                     
                     $.ajax({
@@ -462,28 +487,24 @@ $('#btnExportarExcelModal').on('click', function(){
                         url: url_ajax,
                         dataType: 'json',
                         success: function(data){
-                            $('#id_solicitud').val(data.id_solicitud);
+                            console.log("data:",data)
+                            $('#id_solicitud_rebaja').val(data.id_solicitud_rebaja);
                             $('#slc_sucursal').val(data.id_sucursal);
-                            $('#slc_motivo').val(data.motivo_solicitud);
+                            $('#slc_motivo').val(data.id_motivo_rebaja);
                             $('#fecha_desde').val(data.fecha_desde);
                             $('#fecha_hasta').val(data.fecha_hasta);
                             $('#slc_periodo').val(data.periodo);
                             $('#txt_observaciones').val(data.observaciones);
                             
-                            <% If perfil = "3" Then %>
-                            // Para perfil 3 (CENTRAL), solo permitir editar fechas y periodo
                             $('#slc_sucursal').prop('disabled', true).css('background-color', '#f5f5f5');
-                            $('#slc_motivo').prop('disabled', true).css('background-color', '#f5f5f5');
-                            $('#txt_observaciones').prop('readonly', true).css('background-color', '#f5f5f5');
-                            <% Else %>
-                            // Para otros perfiles
-                            <% If perfil = "2" Then %>
-                                $('#slc_sucursal').prop('disabled', true).css('background-color', '#f5f5f5');
+                            <% If perfil = "3" Then %>
+                                // Para perfil 3 (CENTRAL), solo permitir editar fechas y periodo
+                                $('#slc_motivo').prop('disabled', true).css('background-color', '#f5f5f5');
+                                //$('#txt_observaciones').prop('readonly', true).css('background-color', '#f5f5f5');
                                 <% Else %>
-                                    $('#slc_sucursal').prop('disabled', false).css('background-color', '');
-                            <% End If %>
-                            $('#slc_motivo').prop('disabled', false).css('background-color', '');
-                            $('#txt_observaciones').prop('readonly', false).css('background-color', '');
+                                    // Para otros perfiles
+                                    $('#slc_motivo').prop('disabled', false).css('background-color', '');
+                                    $('#txt_observaciones').prop('readonly', false).css('background-color', '');
                             <% End If %>
 
                             $('#txt_obligatorio').css('color', 'red');
@@ -505,11 +526,10 @@ $('#btnExportarExcelModal').on('click', function(){
                     var id = $(this).data('id');
                     var motivo = $(this).data('motivo');
 
-
-		var url_ajax='../sucursales/eliminar_solicitud_cajero.asp';
-                <% If perfil <> "3" Then %>
-		url_ajax='sucursales/eliminar_solicitud_cajero.asp';
-                <% End If %>
+                    var url_ajax='../sucursales/eliminar_solicitud_cajero.asp';
+                    <% If perfil <> "3" Then %>
+                        url_ajax='sucursales/eliminar_solicitud_cajero.asp';
+                    <% End If %>
                     
                     if(confirm('¡ seguro que desea eliminar la solicitud de ' + motivo + '?')){
                         $.ajax({
@@ -554,19 +574,19 @@ $('#btnExportarExcelModal').on('click', function(){
                     perfil: '<%=perfil%>'
                 };
 
-                var url_ajax='../sucursales/obtener_solicitudes_paginadas.asp';
+                var url_ajax='../sucursales/obtener_solicitudes_rebaja_paginadas.asp';
                 <% If perfil <> "3" Then %>
                 params.idUsuario = '<%=idUsuario%>';
                 params.idSucursal = '<%=idSucursal%>';
-		        url_ajax='sucursales/obtener_solicitudes_paginadas.asp';
+		        url_ajax='sucursales/obtener_solicitudes_rebaja_paginadas.asp';
                 <% End If %>
                 
                 console.log('Parámetros:', params);
 		
 		        console.log('url_ajax', url_ajax);
 
-                params.fechaDesdeSol = $('#fecha_desde_sol').val();
-                params.fechaHastaSol = $('#fecha_hasta_sol').val();
+                params.fechaDesdeSol_rebaja = $('#fecha_desde_sol_rebaja').val();
+                params.fechaHastaSol_rebaja = $('#fecha_hasta_sol_rebaja').val();
 
                 $.ajax({
                     url: url_ajax,
@@ -574,7 +594,7 @@ $('#btnExportarExcelModal').on('click', function(){
                     data: params,
                     dataType: 'json',
                     success: function(data) {
-                        console.log('Datos recibidos:', data);
+                        console.log('Datos recibidos AJAX:', data);
                         var tbody = $('#tbodySolicitudes');
                         tbody.empty();
                         
@@ -582,13 +602,13 @@ $('#btnExportarExcelModal').on('click', function(){
                             tbody.append('<tr><td colspan="<% If perfil = "2" Or perfil = "3" Then %>10<% Else %>9<% End If %>" style="text-align:center">No hay solicitudes registradas</td></tr>');
                         } else {
                             $.each(data.solicitudes, function(i, sol){
-                                var tr = '<tr id="solicitudRow' + sol.id_solicitud + '">';
-                                tr += '<td align="center">' + sol.id_solicitud + '</td>';
+                                var tr = '<tr id="solicitudRow' + sol.id_solicitud_rebaja + '">';
+                                tr += '<td align="center">' + sol.id_solicitud_rebaja + '</td>';
                                 <% If perfil = "2" Or perfil = "3" Then %>
                                 tr += '<td>' + (sol.suc_nombre || '') + '</td>';
                                 <% End If %>
-                                tr += '<td align="center"><span class="label label-' + sol.color_badge + '">' + sol.nombre_estado + '</span></td>';
-                                tr += '<td>' + sol.motivo_solicitud_texto + '</td>';
+                                tr += '<td align="center"><span class="label label-' + sol.color_badge_rebaja + '">' + sol.nombre_estado_rebaja + '</span></td>';
+                                tr += '<td>' + sol.nombre_motivo_rebaja + '</td>';
                                 tr += '<td align="center">' + (sol.fecha_desde || '') + '</td>';
                                 tr += '<td align="center">' + (sol.fecha_hasta || '') + '</td>';
                                 tr += '<td align="center">' + sol.periodo + '</td>';
@@ -597,36 +617,36 @@ $('#btnExportarExcelModal').on('click', function(){
                                 tr += '<td align="center">';
 
                                 <% If perfil = "3" Then %>
-                                    if(parseInt(sol.id_estado) === 3 ) {
-                                        tr += '<i class="icon-exchange icon-large mano btnCambiarEstado" data-id="' + sol.id_solicitud + '" data-estado="' + sol.id_estado + '" title="Cambiar Estado"></i> ';
+                                    if(parseInt(sol.id_estado_rebaja) === 3 ) {
+                                        tr += '<i class="icon-exchange icon-large mano btnCambiarEstadoRebaja" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '" data-estado_rebaja="' + sol.id_estado_rebaja + '" title="Cambiar Estado"></i> ';
                                     }
                                 <% Else %>
                                     <% If perfil = "2" Then %>
-                                        if(parseInt(sol.id_estado) === 1 || parseInt(sol.id_estado) === 3 ) {
-                                            tr += '<i class="icon-exchange icon-large mano btnCambiarEstado" data-id="' + sol.id_solicitud + '" data-estado="' + sol.id_estado + '" title="Cambiar Estado"></i> ';
+                                        if(parseInt(sol.id_estado_rebaja) === 1 || parseInt(sol.id_estado_rebaja) === 3 ) {
+                                            tr += '<i class="icon-exchange icon-large mano btnCambiarEstadoRebaja" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  data-estado_rebaja="' + sol.id_estado_rebaja + '" title="Cambiar Estado"></i> ';
                                         }
                                     <% End If %>
                                     <% If perfil = "1" Then %>
-                                        if(parseInt(sol.id_estado) === 1 ) {
-                                            tr += '<i class="icon-exchange icon-large mano btnCambiarEstado" data-id="' + sol.id_solicitud + '" data-estado="' + sol.id_estado + '" title="Cambiar Estado"></i> ';
+                                        if(parseInt(sol.id_estado_rebaja) === 1 ) {
+                                            tr += '<i class="icon-exchange icon-large mano btnCambiarEstadoRebaja" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  data-estado_rebaja="' + sol.id_estado_rebaja + '" title="Cambiar Estado"></i> ';
                                         }
                                     <% End If %>
                                 <% End If %>
 
                                 <% If perfil = "1" Then %>
-                                    if(parseInt(sol.id_estado) === 1) {
-                                        tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud + '" title="Editar"></i> ';
+                                    if(parseInt(sol.id_estado_rebaja) === 1) {
+                                        tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  title="Editar"></i> ';
                                     }
                                     <% ElseIf perfil = "2" Then %>
-                                    if(parseInt(sol.id_estado) === 1 || parseInt(sol.id_estado) === 3 ) {
-                                        tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud + '" title="Editar"></i> ';
+                                    if(parseInt(sol.id_estado_rebaja) === 1 || parseInt(sol.id_estado_rebaja) === 3) {
+                                        tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  title="Editar"></i> ';
                                     }
                                         <% ElseIf perfil = "3" Then %>
-                                        if(parseInt(sol.id_estado) === 3) {
-                                            tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud + '" title="Editar"></i> ';
+                                        if(parseInt(sol.id_estado_rebaja) === 3) {
+                                            tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  title="Editar"></i> ';
                                         }
                                 <% End If %>
-                                tr += '<i class="icon-list-alt icon-large mano btnVerHistorial" data-id="' + sol.id_solicitud + '" title="Ver Historial"></i>';
+                                tr += '<i class="icon-list-alt icon-large mano btnVerHistorial" data-id="' + sol.id_solicitud_rebaja + '" title="Ver Historial"></i>';
                                 
                                 tr += '</td>';
                                 tr += '</tr>';
@@ -763,13 +783,13 @@ function cargarTablaSolicitudes() {
                 tbody.append('<tr><td colspan="<% If perfil = "2" Or perfil = "3" Then %>10<% Else %>9<% End If %>" style="text-align:center">No hay solicitudes registradas</td></tr>');
             } else {
                 $.each(solicitudes, function(i, sol){
-                    var tr = '<tr id="solicitudRow' + sol.id_solicitud + '">';
-                    tr += '<td align="center">' + sol.id_solicitud + '</td>';
+                    var tr = '<tr id="solicitudRow' + sol.id_solicitud_rebaja + '">';
+                    tr += '<td align="center">' + sol.id_solicitud_rebaja + '</td>';
                     <% If perfil = "2" Or perfil = "3" Then %>
                     tr += '<td>' + (sol.suc_nombre || '') + '</td>';
                     <% End If %>
-                    tr += '<td align="center"><span class="label label-' + sol.color_badge + '">' + sol.nombre_estado + '</span></td>';
-                    tr += '<td>' + sol.motivo_solicitud_texto + '</td>';
+                    tr += '<td align="center"><span class="label label-' + sol.color_badge_rebaja + '">' + sol.nombre_estado_rebaja + '</span></td>';
+                    tr += '<td>' + sol.nombre_motivo_rebaja + '</td>';
                     tr += '<td align="center">' + (sol.fecha_desde || '') + '</td>';
                     tr += '<td align="center">' + (sol.fecha_hasta || '') + '</td>';
                     tr += '<td align="center">' + sol.periodo + '</td>';
@@ -779,35 +799,35 @@ function cargarTablaSolicitudes() {
 
                     <% If perfil = "3" Then %>
                         if(parseInt(sol.id_estado) === 3) {
-                            tr += '<i class="icon-exchange icon-large mano btnCambiarEstado" data-id="' + sol.id_solicitud + '" data-estado="' + sol.id_estado + '" title="Cambiar Estado"></i> ';
+                            tr += '<i class="icon-exchange icon-large mano btnCambiarEstadoRebaja" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  data-estado_rebaja="' + sol.id_estado + '" title="Cambiar Estado"></i> ';
                         }
                     <% Else %>
                         <% If perfil = "2" Then %>
                             if(parseInt(sol.id_estado) === 1 || parseInt(sol.id_estado) === 3 ) {
-                                tr += '<i class="icon-exchange icon-large mano btnCambiarEstado" data-id="' + sol.id_solicitud + '" data-estado="' + sol.id_estado + '" title="Cambiar Estado"></i> ';
+                                tr += '<i class="icon-exchange icon-large mano btnCambiarEstadoRebaja" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  data-estado_rebaja="' + sol.id_estado + '" title="Cambiar Estado"></i> ';
                             }
                         <% End If %>
                         <% If perfil = "1" Then %>
                             if(parseInt(sol.id_estado) === 1 ) {
-                                tr += '<i class="icon-exchange icon-large mano btnCambiarEstado" data-id="' + sol.id_solicitud + '" data-estado="' + sol.id_estado + '" title="Cambiar Estado"></i> ';
+                                tr += '<i class="icon-exchange icon-large mano btnCambiarEstadoRebaja" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  data-estado_rebaja="' + sol.id_estado + '" title="Cambiar Estado"></i> ';
                             }
                         <% End If %>
                     <% End If %>
 
                     <% If perfil = "1" Then %>
                         if(parseInt(sol.id_estado) === 1) {
-                            tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud + '" title="Editar"></i> ';
+                            tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  title="Editar"></i> ';
                         }
                         <% ElseIf perfil = "2" Then %>
-                        if(parseInt(sol.id_estado) === 1 || parseInt(sol.id_estado) === 3 ) {
-                            tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud + '" title="Editar"></i> ';
+                        if(parseInt(sol.id_estado) === 1 || parseInt(sol.id_estado) === 3) {
+                            tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  title="Editar"></i> ';
                         }
                             <% ElseIf perfil = "3" Then %>
                             if(parseInt(sol.id_estado) === 3) {
-                                tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud + '" title="Editar"></i> ';
+                                tr += '<i class="icon-pencil icon-large mano btnEditarSolicitud" data-id="' + sol.id_solicitud_rebaja + '" data-id_motivoActual="' + sol.id_motivo_rebaja + '"  title="Editar"></i> ';
                             }
                     <% End If %>
-                    tr += '<i class="icon-list-alt icon-large mano btnVerHistorial" data-id="' + sol.id_solicitud + '" title="Ver Historial"></i>';
+                    tr += '<i class="icon-list-alt icon-large mano btnVerHistorial" data-id="' + sol.id_solicitud_rebaja + '" title="Ver Historial"></i>';
                     tr += '</td>';
                     tr += '</tr>';
                     tbody.append(tr);
@@ -840,7 +860,7 @@ function activarEventosBotones() {
         $.ajax({
             type: 'GET',
             url: url_ajax,
-            data: {id_solicitud: id},
+            data: {id_solicitud_rebaja: id},
             dataType: 'json',
             success: function(data){
                 console.log('Datos recibidos:', data);
@@ -851,7 +871,7 @@ function activarEventosBotones() {
                 }
                 
                 // Llenar los campos del formulario
-                $('#id_solicitud').val(data.id_solicitud);
+                $('#id_solicitud_rebaja').val(data.id_solicitud_rebaja);
                 $('#slc_sucursal').val(data.id_sucursal);
                 $('#slc_motivo').val(data.motivo_solicitud);
                 $('#fecha_desde').val(data.fecha_desde);
@@ -874,17 +894,16 @@ function activarEventosBotones() {
                 }
                 
                 $('#txt_observaciones').val(data.observaciones);
-                
-                <% If perfil = "3" Then %>
-                // Para perfil 3 (CENTRAL), solo permitir editar fechas
                 $('#slc_sucursal').prop('disabled', true).css('background-color', '#f5f5f5');
-                $('#slc_motivo').prop('disabled', true).css('background-color', '#f5f5f5');
-                $('#txt_observaciones').prop('readonly', true).css('background-color', '#f5f5f5');
-                <% Else %>
-                // Para otros perfiles, permitir editar todo
-                $('#slc_sucursal').prop('disabled', false).css('background-color', '');
-                $('#slc_motivo').prop('disabled', false).css('background-color', '');
-                $('#txt_observaciones').prop('readonly', false).css('background-color', '');
+                <% If perfil = "3" Then %>
+                    // Para perfil 3 (CENTRAL), solo permitir editar fechas
+                    $('#slc_motivo').prop('disabled', true).css('background-color', '#f5f5f5');
+                    //$('#txt_observaciones').prop('readonly', true).css('background-color', '#f5f5f5');
+                    <% Else %>
+                        // Para otros perfiles, permitir editar todo
+                        //$('#slc_sucursal').prop('disabled', false).css('background-color', '');
+                        $('#slc_motivo').prop('disabled', false).css('background-color', '');
+                        $('#txt_observaciones').prop('readonly', false).css('background-color', '');
                 <% End If %>
                 
                 // Mostrar el formulario
@@ -930,7 +949,7 @@ function activarEventosBotones() {
     });
 
     // Exportar excel
-    $(document).on('click', '.btnExportarExcel', function(){
+    $(document).on('click', '.btnExportarExcelRebaja', function(){
         try {
             $('#modalExportarExcel').modal('show');
             
@@ -941,19 +960,21 @@ function activarEventosBotones() {
     });
 
     // Cambiar estado de solicitud - CON DELEGACIÓN DE EVENTOS
-    $(document).on('click', '.btnCambiarEstado', function(){
+    $(document).on('click', '.btnCambiarEstadoRebaja', function(){
         var id = $(this).data('id');
-        var estadoActual = $(this).data('estado');
+        var estadoActual_rebaja = $(this).data('estado_rebaja');
+        var motivoActual_rebaja = $(this).data('id_motivoactual');
         
-        console.log('ID:', id, 'Estado actual:', estadoActual);
+        console.log('ID:', id, 'Estado actual:', estadoActual_rebaja);
+        console.log('ID:', id, 'Motivo actual:', motivoActual_rebaja);
         
-        $('#modalCambiarEstado #id_solicitud_estado').val(id);
-        $('#modalCambiarEstado #estado_actual_id').val(estadoActual);
+        $('#modalCambiarEstado_rebaja #id_solicitud_rebaja_estado').val(id);
+        $('#modalCambiarEstado_rebaja #estado_actual_rebaja_id').val(estadoActual_rebaja);
 
-		var url_ajax='../sucursales/obtener_estados_solicitud.asp';
-                <% If perfil <> "3" Then %>
-		url_ajax='sucursales/obtener_estados_solicitud.asp';
-                <% End If %>
+		var url_ajax='../sucursales/obtener_estados_solicitud_rebaja.asp';
+        <% If perfil <> "3" Then %>
+		    url_ajax='sucursales/obtener_estados_solicitud_rebaja.asp';
+        <% End If %>
         
         // Cargar estados con AJAX
         $.ajax({
@@ -961,13 +982,13 @@ function activarEventosBotones() {
             type: 'GET',
             data: {
                 perfil: '<%=perfil%>',
-                estado_actual: estadoActual
+                estado_actual: estadoActual_rebaja
             },
             dataType: 'text',
             success: function(data){
                 console.log('Respuesta recibida:', data);
                 
-                var select = $('#modalCambiarEstado #slc_nuevo_estado');
+                var select = $('#modalCambiarEstado_rebaja #slc_nuevo_estado_rebaja');
                 select.empty().append('<option value="">Seleccione nuevo estado...</option>');
                 
                 // Extraer solo el JSON del texto
@@ -989,13 +1010,13 @@ function activarEventosBotones() {
                         console.log('Estados parseados:', estados);
                         
                         $.each(estados, function(i, estado){
-                            if(estado.id_estado != estadoActual){
-                                select.append('<option value="' + estado.id_estado + '" data-requiere="' + estado.requiere_comentario + '">' + estado.nombre_estado + '</option>');
+                            if(estado.id_estado_rebaja != estadoActual_rebaja){
+                                select.append('<option value="' + estado.id_estado_rebaja + '" data-requiere="' + estado.requiere_comentario_rebaja + '">' + estado.nombre_estado_rebaja + '</option>');
                             }
                         });
                         
                         console.log('Opciones agregadas, abriendo modal...');
-                        $('#modalCambiarEstado').modal('show');
+                        $('#modalCambiarEstado_rebaja').modal('show');
                         
                     } catch(e) {
                         console.error('Error al parsear JSON:', e);
@@ -1008,7 +1029,72 @@ function activarEventosBotones() {
             },
             error: function(xhr, status, error){
                 console.error('Error AJAX:', status, error);
-                alert('Error al cargar estados');
+                alert('Error al cargar estados rebaja');
+            }
+        });
+
+		url_ajax='../sucursales/obtener_motivos_solicitud_rebaja.asp';
+        <% If perfil <> "3" Then %>
+    		url_ajax='sucursales/obtener_motivos_solicitud_rebaja.asp';
+        <% End If %>
+
+        // Cargar motivo rebaja con AJAX
+        $.ajax({
+            url: url_ajax,
+            type: 'GET',
+            data: {
+                perfil: '<%=perfil%>',
+                motivo_actual: motivoActual_rebaja
+            },
+            dataType: 'text',
+            success: function(data){
+                console.log('Respuesta recibida Motivos:', data);
+                
+                var select = $('#modalCambiarEstado_rebaja #slc_motivo_rebaja');
+                select.empty().append('<option value="">Seleccione motivo rebaja...</option>');
+                $('#slc_motivo_rebaja').prop('disabled', true).css('background-color', '');
+                
+                // Extraer solo el JSON del texto
+                var jsonStart = data.indexOf('[');
+                var jsonEnd = data.lastIndexOf(']') + 1;
+                
+                console.log('JSON inicio:', jsonStart, 'JSON fin:', jsonEnd);
+                
+                if(jsonStart >= 0 && jsonEnd > 0){
+                    var jsonStr = data.substring(jsonStart, jsonEnd);
+                    // Limpiar caracteres especiales que rompen el JSON
+                    jsonStr = jsonStr.replace(/ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â/g, '');
+                    // Eliminar comas antes de ] o }
+                    jsonStr = jsonStr.replace(/,(\s*[\]\}])/g, '$1');
+                    console.log('JSON extraido y limpio:', jsonStr);
+                    
+                    try {
+                        var motivos = JSON.parse(jsonStr);
+                        console.log('Motivos parseados:', motivos);
+                        
+                        $.each(motivos, function(i, motivo){
+                            if(motivo.id_motivo_rebaja != motivoActual_rebaja){
+                                select.append('<option value="' + motivo.id_motivo_rebaja + '" data-requiere="' + motivo.requiere_comentario + '">' + motivo.nombre_motivo_rebaja + '</option>');
+                            }else{
+                                select.append('<option selected value="' + motivo.id_motivo_rebaja + '" data-requiere="' + motivo.requiere_comentario + '">' + motivo.nombre_motivo_rebaja + '</option>');
+                            }
+                        });
+                        
+                        console.log('Opciones agregadas, abriendo modal...');
+                        $('#modalCambiarEstado_rebaja').modal('show');
+                        
+                    } catch(e) {
+                        console.error('Error al parsear JSON:', e);
+                        alert('Error al procesar estados');
+                    }
+                } else {
+                    console.error('No se encontlido en la respuesta');
+                    alert('Respuesta invalida del servidor');
+                }
+            },
+            error: function(xhr, status, error){
+                console.error('Error AJAX:', status, error);
+                alert('Error al cargar motivos');
             }
         });
     });
@@ -1017,10 +1103,10 @@ function activarEventosBotones() {
     $(document).on('click', '.btnVerHistorial', function(){
         var id = $(this).data('id');
 
-		var url_ajax='../sucursales/obtener_historial_estados.asp?id_solicitud=' + id;
-                <% If perfil <> "3" Then %>
-		url_ajax='sucursales/obtener_historial_estados.asp?id_solicitud=' + id;
-                <% End If %>
+		var url_ajax='../sucursales/obtener_historial_estados_rebaja.asp?id_solicitud_rebaja=' + id;
+        <% If perfil <> "3" Then %>
+		    url_ajax='sucursales/obtener_historial_estados_rebaja.asp?id_solicitud_rebaja=' + id;
+        <% End If %>
         
         $.ajax({
             url: url_ajax,
@@ -1037,7 +1123,7 @@ function activarEventosBotones() {
                         var tr = '<tr>';
                         tr += '<td align="center">' + (item.estado_anterior || 'N/A') + '</td>';
                         tr += '<td align="center"><i class="icon-arrow-right"></i></td>';
-                        tr += '<td align="center"><span class="label label-' + item.color_badge + '">' + item.estado_nuevo + '</span></td>';
+                        tr += '<td align="center"><span class="label label-' + item.color_badge_rebaja + '">' + item.estado_nuevo + '</span></td>';
                         tr += '<td>' + (item.comentario || '') + '</td>';
                         tr += '<td align="center">' + item.usuario_cambio + '<br/><small>' + item.fecha_cambio + '</small></td>';
                         tr += '</tr>';
@@ -1082,8 +1168,8 @@ function activarEventosBotones() {
                         %>                        
                         <div class="controls">
                             <input type="date" 
-                                name="fecha_desde_sol" 
-                                id="fecha_desde_sol" 
+                                name="fecha_desde_sol_rebaja" 
+                                id="fecha_desde_sol_rebaja" 
                                 class="input-medium" 
                                 min="<%= strMin %>" 
                                 max="<%= Year(Date()) & "-" & Right("0" & Month(Date()), 2) & "-" & Right("0" & Day(Date()), 2) %>"
@@ -1095,7 +1181,7 @@ function activarEventosBotones() {
                     <div class="span5" style="text-align:left;">
                         <label style="display:inline-block; margin-right:10px;">Registro hasta:</label>
                         <div class="controls">
-                            <input type="date" name="fecha_hasta_sol" id="fecha_hasta_sol" class="input-medium" value="<%=Year(Date()) & "-" & Right("0" & Month(Date()), 2) & "-" & Right("0" & Day(Date()), 2)%>" />
+                            <input type="date" name="fecha_hasta_sol_rebaja" id="fecha_hasta_sol_rebaja" class="input-medium" value="<%=Year(Date()) & "-" & Right("0" & Month(Date()), 2) & "-" & Right("0" & Day(Date()), 2)%>" />
                         </div>
                     </div>
                 </div>
@@ -1104,30 +1190,39 @@ function activarEventosBotones() {
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal">Cancelar</button>
-        <button class="btn btn-primary" id="btnExportarExcelModal">Exportar</button>
+        <button class="btn btn-primary" id="btnExportarExcelRebajaModal">Exportar</button>
     </div>
 </div>
 
 <!-- Modal: Cambiar Estado -->
-<div id="modalCambiarEstado" class="modal hide fade" tabindex="-1" role="dialog">
+<div id="modalCambiarEstado_rebaja" class="modal hide fade" tabindex="-1" role="dialog">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3>Cambiar Estado de Solicitud</h3>
     </div>
     <div class="modal-body">
-        <form id="formCambiarEstado">
-            <input type="hidden" id="id_solicitud_estado" name="id_solicitud_estado" />
-            <input type="hidden" id="estado_actual_id" name="estado_actual_id" />
+        <form id="formCambiarEstado_rebaja">
+            <input type="hidden" id="id_solicitud_rebaja_estado" name="id_solicitud_rebaja_estado" />
+            <input type="hidden" id="estado_actual_rebaja_id" name="estado_actual_rebaja_id" />
             
             <div class="control-group">
                 <label class="control-label"><strong>Nuevo Estado: <span style="color:red;">*</span></strong></label>
                 <div class="controls">
-                    <select id="slc_nuevo_estado" name="slc_nuevo_estado" class="span10" required>
+                    <select id="slc_nuevo_estado_rebaja" name="slc_nuevo_estado_rebaja" class="span10" required>
                         <option value="">Seleccione nuevo estado...</option>
                     </select>
                 </div>
             </div>
             
+            <div class="control-group">
+                <label class="control-label"><strong>Motivo rebaja: <span style="color:red;">*</span></strong></label>
+                <div class="controls">
+                    <select id="slc_motivo_rebaja" name="slc_motivo_rebaja" class="span10" required>
+                        <option value="">Seleccione motivo...</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="control-group" id="divComentarioEstado">
                 <label class="control-label"><strong>Comentario: <span style="color:red;">*</span></strong></label>
                 <div class="controls">
@@ -1192,31 +1287,39 @@ function activarEventosBotones() {
 
 // Guardar cambio de estado
 $('#btnGuardarEstado').on('click', function(){
-    var idSolicitud = $('#id_solicitud_estado').val();
-    var nuevoEstado = $('#slc_nuevo_estado').val();
+    var idSolicitudRebaja = $('#id_solicitud_rebaja_estado').val();
+    var nuevoEstado = $('#slc_nuevo_estado_rebaja').val();
+    var nombreEstado = $('#slc_nuevo_estado_rebaja option:selected').text();
+    var nuevoMotivo = $('#slc_motivo_rebaja').val();
+    var nombreMotivo = $('#slc_motivo_rebaja option:selected').text();
     var comentario = $('#txt_comentario_estado').val();
-    var nombreEstado = $('#slc_nuevo_estado option:selected').text();
+    
     
     if(nuevoEstado === ''){
         alert('Debe seleccionar un nuevo estado');
         return;
     }
     
+    if(nuevoMotivo === ''){
+        alert('Debe seleccionar un motivo');
+        return;
+    }
+
     if(comentario.trim() === ''){
         alert('El comentario es obligatorio');
         return;
     }
 
-		var url_ajax='../sucursales/cambiar_estado_solicitud.asp';
-                <% If perfil <> "3" Then %>
-		url_ajax='sucursales/cambiar_estado_solicitud.asp';
-                <% End If %>
+    var url_ajax='../sucursales/cambiar_estado_solicitud_rebaja.asp';
+    <% If perfil <> "3" Then %>
+        url_ajax='sucursales/cambiar_estado_solicitud_rebaja.asp';
+    <% End If %>
     
     $.ajax({
         url: url_ajax,
         type: 'POST',
         data: {
-            id_solicitud: idSolicitud,
+            id_solicitud_rebaja: idSolicitudRebaja,
             id_estado_nuevo: nuevoEstado,
             comentario: comentario
         },
@@ -1224,12 +1327,12 @@ $('#btnGuardarEstado').on('click', function(){
         success: function(response){
             if(response.resultado === 'OK'){
                 alert('Estado actualizado correctamente');
-                $('#modalCambiarEstado').modal('hide');
-                $('#formCambiarEstado')[0].reset();
+                $('#modalCambiarEstado_rebaja').modal('hide');
+                $('#formCambiarEstado_rebaja')[0].reset();
                 cargarTablaSolicitudesPaginada(1);
                 
                 // Registrar log del cambio de estado
-                registrarLog('Solicitud Cajeros Adicionales', 'Cambiar estado a ' + nombreEstado);
+                registrarLog('Solicitud Rebaja Cajeros Adicionales', 'Cambiar estado a ' + nombreEstado);
             } else {
                 alert('Alerta: ' + response.mensaje);
             }
@@ -1242,8 +1345,8 @@ $('#btnGuardarEstado').on('click', function(){
 });
 
 // Limpiar formulario al cerrar modal
-$('#modalCambiarEstado').on('hidden', function(){
-    $('#formCambiarEstado')[0].reset();
+$('#modalCambiarEstado_rebaja').on('hidden', function(){
+    $('#formCambiarEstado_rebaja')[0].reset();
 });
 </script>
   

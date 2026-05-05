@@ -97,10 +97,9 @@ BEGIN
               AND EVA_EMP = @EVA_EMP
               AND EVA_FCH_DES = @EVA_FCH_DES
               AND EVA_FCH_HAS = @EVA_FCH_HAS
-              AND EVA_EST = @EVA_EST
         )
         BEGIN
-            SELECT 'ERROR' AS resultado, 'Ya existe una evaluacion activa con los mismos datos para el cajero.' AS mensaje, CAST(NULL AS INT) AS id_eva;
+            SELECT 'ERROR' AS resultado, 'Ya existe una evaluacion con los mismos datos para el cajero.' AS mensaje, CAST(NULL AS INT) AS id_eva;
             RETURN;
         END;
 
@@ -138,13 +137,3 @@ BEGIN
     END CATCH
 END;
 GO
-
-/*
-Nota:
-- La validacion del SP para EVA_NOMBRE esta alineada a 100 caracteres.
-- El CSV de ejemplo contiene nombres bastante mas largos.
-- Si quieres permitir mas de 100 caracteres, ajusta la tabla y este SP:
-
-ALTER TABLE dbo.SUC_CAP_EVA
-ALTER COLUMN EVA_NOMBRE VARCHAR(100) NULL;
-*/

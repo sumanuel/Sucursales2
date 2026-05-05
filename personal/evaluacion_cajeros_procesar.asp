@@ -29,6 +29,8 @@ Dim empresaEva
 Dim fechaDesdeEva
 Dim fechaHastaEva
 Dim pesoArchivo
+Dim rsDup
+Dim sqlDup
 
 archivoPath = Server.MapPath("../upload/evaluacion_cajeros.csv")
 comentarioGeneral = Trim(Request("eva_com"))
@@ -112,9 +114,18 @@ Function FormatearPeso(bytes)
     End If
 End Function
 
+Function SqlTexto(valor)
+    SqlTexto = Replace(Trim(CStr(valor)), "'", "''")
+End Function
+
+Function SqlFecha(valorFecha)
+    SqlFecha = Year(CDate(valorFecha)) & Right("0" & Month(CDate(valorFecha)), 2) & Right("0" & Day(CDate(valorFecha)), 2)
+End Function
+
 Sub ResponderJson(resultado, insertadosTotal, erroresTotal, mensajesLista, archivo, peso)
     Dim i
-    Response.Write "{""resultado"":""" & JsonSafe(resultado) & """,""insertados"":" & insertadosTotal & ",""errores"":" & erroresTotal & ",""archivo"":""" & JsonSafe(archivo) & """,""peso"":""" & JsonSafe(peso) & """,""mensajes"":["
+    Response.Write "{""resultado"":""" & JsonSafe(resultado) & """,""insertados"":" & insertadosTotal & ",""errores"":" & erroresTotal & ",""archivo"":""" & JsonSafe(archivo) & """,""peso"":""" & JsonSafe(peso) & """,""mensajes"":"
+    Response.Write "["
     For i = 0 To UBound(mensajesLista)
         If i > 0 Then
             Response.Write ","
@@ -182,68 +193,85 @@ Do Until archivoTexto.AtEndOfStream
                 ReDim Preserve mensajes(totalMensajes)
                 mensajes(totalMensajes) = "Linea " & lineaActual & ": hay campos obligatorios vacios."
             Else
-                Set cmd = Server.CreateObject("ADODB.Command")
-                Set cmd.ActiveConnection = db
-                cmd.NamedParameters = True
-                cmd.CommandType = 4
-                cmd.CommandText = "SP_SUC_insertar_eva_cajero"
-                cmd.Parameters.Append cmd.CreateParameter("@EVA_RUT", 200, 1, 10, rutEva)
-                cmd.Parameters.Append cmd.CreateParameter("@EVA_NOMBRE", 200, 1, 150, nombreEva)
-                cmd.Parameters.Append cmd.CreateParameter("@EVA_SUC", 3, 1, , sucursalEva)
-                cmd.Parameters.Append cmd.CreateParameter("@EVA_EMP", 200, 1, 150, empresaEva)
-                cmd.Parameters.Append cmd.CreateParameter("@EVA_FCH_DES", 7, 1, , fechaDesdeEva)
-                cmd.Parameters.Append cmd.CreateParameter("@EVA_FCH_HAS", 7, 1, , fechaHastaEva)
-                cmd.Parameters.Append cmd.CreateParameter("@EVA_COM", 200, 1, 250, comentarioGeneral)
-                cmd.Parameters.Append cmd.CreateParameter("@EVA_EST", 2, 1, , 1)
-                cmd.Parameters.Append cmd.CreateParameter("@EVA_USR", 200, 1, 50, usuarioLog)
+                sqlDup = "SELECT TOP 1 ID_EVA FROM dbo.SUC_CAP_EVA WHERE EVA_RUT = '" & SqlTexto(rutEva) & "' AND EVA_SUC = " & CLng(sucursalEva) & " AND EVA_EMP = '" & SqlTexto(empresaEva) & "' AND EVA_FCH_DES = '" & SqlFecha(fechaDesdeEva) & "' AND EVA_FCH_HAS = '" & SqlFecha(fechaHastaEva) & "'"
+                Set rsDup = db.Execute(sqlDup)
 
-                Set rsResultado = Nothing
-                On Error Resume Next
-                Set rsResultado = cmd.Execute
-
-                If Err.Number <> 0 Then
+                If Not rsDup.EOF Then
                     errores = errores + 1
                     totalMensajes = totalMensajes + 1
                     ReDim Preserve mensajes(totalMensajes)
-                    mensajes(totalMensajes) = "Linea " & lineaActual & ": error al ejecutar SP_SUC_insertar_eva_cajero - " & Err.Description
-                    Err.Clear
+                    mensajes(totalMensajes) = "Linea " & lineaActual & ": ya existe una evaluacion con los mismos datos para el cajero."
                 Else
-                    resultadoSp = "OK"
-                    mensajeSp = ""
+                    Set cmd = Server.CreateObject("ADODB.Command")
+                    Set cmd.ActiveConnection = db
+                    cmd.NamedParameters = True
+                    cmd.CommandType = 4
+                    cmd.CommandText = "SP_SUC_insertar_eva_cajero"
+                    cmd.Parameters.Append cmd.CreateParameter("@EVA_RUT", 200, 1, 10, rutEva)
+                    cmd.Parameters.Append cmd.CreateParameter("@EVA_NOMBRE", 200, 1, 150, nombreEva)
+                    cmd.Parameters.Append cmd.CreateParameter("@EVA_SUC", 3, 1, , sucursalEva)
+                    cmd.Parameters.Append cmd.CreateParameter("@EVA_EMP", 200, 1, 150, empresaEva)
+                    cmd.Parameters.Append cmd.CreateParameter("@EVA_FCH_DES", 7, 1, , fechaDesdeEva)
+                    cmd.Parameters.Append cmd.CreateParameter("@EVA_FCH_HAS", 7, 1, , fechaHastaEva)
+                    cmd.Parameters.Append cmd.CreateParameter("@EVA_COM", 200, 1, 250, comentarioGeneral)
+                    cmd.Parameters.Append cmd.CreateParameter("@EVA_EST", 2, 1, , 1)
+                    cmd.Parameters.Append cmd.CreateParameter("@EVA_USR", 200, 1, 50, usuarioLog)
 
-                    If IsObject(rsResultado) Then
-                        If Not rsResultado.EOF Then
-                            On Error Resume Next
-                            resultadoSp = Trim(CStr(rsResultado("resultado") & ""))
-                            mensajeSp = Trim(CStr(rsResultado("mensaje") & ""))
-                            On Error GoTo 0
-                        End If
-                    End If
+                    Set rsResultado = Nothing
+                    On Error Resume Next
+                    Set rsResultado = cmd.Execute
 
-                    If resultadoSp <> "" And UCase(resultadoSp) <> "OK" Then
+                    If Err.Number <> 0 Then
                         errores = errores + 1
                         totalMensajes = totalMensajes + 1
                         ReDim Preserve mensajes(totalMensajes)
-                        If mensajeSp = "" Then
-                            mensajeSp = "El procedimiento almacenado devolvio un resultado distinto de OK."
-                        End If
-                        mensajes(totalMensajes) = "Linea " & lineaActual & ": " & mensajeSp
+                        mensajes(totalMensajes) = "Linea " & lineaActual & ": error al ejecutar SP_SUC_insertar_eva_cajero - " & Err.Description
+                        Err.Clear
                     Else
-                        insertados = insertados + 1
-                        totalMensajes = totalMensajes + 1
-                        ReDim Preserve mensajes(totalMensajes)
-                        mensajes(totalMensajes) = "Linea " & lineaActual & ": registro cargado correctamente para " & rutEva & "."
+                        resultadoSp = "OK"
+                        mensajeSp = ""
+
+                        If IsObject(rsResultado) Then
+                            If Not rsResultado.EOF Then
+                                On Error Resume Next
+                                resultadoSp = Trim(CStr(rsResultado("resultado") & ""))
+                                mensajeSp = Trim(CStr(rsResultado("mensaje") & ""))
+                                On Error GoTo 0
+                            End If
+                        End If
+
+                        If resultadoSp <> "" And UCase(resultadoSp) <> "OK" Then
+                            errores = errores + 1
+                            totalMensajes = totalMensajes + 1
+                            ReDim Preserve mensajes(totalMensajes)
+                            If mensajeSp = "" Then
+                                mensajeSp = "El procedimiento almacenado devolvio un resultado distinto de OK."
+                            End If
+                            mensajes(totalMensajes) = "Linea " & lineaActual & ": " & mensajeSp
+                        Else
+                            insertados = insertados + 1
+                            totalMensajes = totalMensajes + 1
+                            ReDim Preserve mensajes(totalMensajes)
+                            mensajes(totalMensajes) = "Linea " & lineaActual & ": registro cargado correctamente para " & rutEva & "."
+                        End If
                     End If
+
+                    On Error GoTo 0
+                    If IsObject(rsResultado) Then
+                        If rsResultado.State = 1 Then
+                            rsResultado.Close
+                        End If
+                        Set rsResultado = Nothing
+                    End If
+                    Set cmd = Nothing
                 End If
 
-                On Error GoTo 0
-                If IsObject(rsResultado) Then
-                    If rsResultado.State = 1 Then
-                        rsResultado.Close
+                If IsObject(rsDup) Then
+                    If rsDup.State = 1 Then
+                        rsDup.Close
                     End If
-                    Set rsResultado = Nothing
+                    Set rsDup = Nothing
                 End If
-                Set cmd = Nothing
             End If
             On Error GoTo 0
         End If

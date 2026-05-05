@@ -1,4 +1,4 @@
-<div class="container-fluid" style="margin-top: 20px">
+<div class="container-fluid" style="margin-top: 4px">
   <div class="row-fluid">
     <div class="span12">
       <div class="well">

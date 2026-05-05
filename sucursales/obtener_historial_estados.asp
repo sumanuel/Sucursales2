@@ -4,6 +4,34 @@
 Response.ContentType = "application/json"
 Response.Charset = "UTF-8"
 
+Function FormatearFechaHoraDMY(valorFecha)
+    If IsNull(valorFecha) Or Trim(CStr(valorFecha)) = "" Then
+        FormatearFechaHoraDMY = ""
+        Exit Function
+    End If
+
+    Dim fechaValor, hora12, minutos, segundos, sufijo
+    fechaValor = CDate(valorFecha)
+
+    hora12 = Hour(fechaValor)
+    sufijo = "AM"
+
+    If hora12 >= 12 Then
+        sufijo = "PM"
+    End If
+
+    If hora12 = 0 Then
+        hora12 = 12
+    ElseIf hora12 > 12 Then
+        hora12 = hora12 - 12
+    End If
+
+    minutos = Right("0" & Minute(fechaValor), 2)
+    segundos = Right("0" & Second(fechaValor), 2)
+
+    FormatearFechaHoraDMY = Right("0" & Day(fechaValor), 2) & "/" & Right("0" & Month(fechaValor), 2) & "/" & Year(fechaValor) & " " & hora12 & ":" & minutos & ":" & segundos & " " & sufijo
+End Function
+
 Dim id_solicitud
 id_solicitud = Request.QueryString("id_solicitud")
 
@@ -49,7 +77,7 @@ Do While Not rs.EOF
     Response.Write """color_badge"":""" & rs("color_badge") & ""","
     Response.Write """comentario"":""" & Replace(rs("comentario"), """", "\""") & ""","
     Response.Write """usuario_cambio"":""" & rs("usuario_cambio") & ""","
-    Response.Write """fecha_cambio"":""" & rs("fecha_cambio") & """"
+    Response.Write """fecha_cambio"":""" & FormatearFechaHoraDMY(rs("fecha_cambio")) & """"
     Response.Write "}"
     
     rs.MoveNext

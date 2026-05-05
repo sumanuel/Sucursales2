@@ -1,5 +1,15 @@
 ﻿<!--#include file="../conexion/conexion.asp"-->
 
+<%
+Function FormatearFechaDMY(valorFecha)
+  If IsNull(valorFecha) Or Trim(CStr(valorFecha)) = "" Then
+    FormatearFechaDMY = ""
+  Else
+    FormatearFechaDMY = Right("0" & Day(CDate(valorFecha)), 2) & "/" & Right("0" & Month(CDate(valorFecha)), 2) & "/" & Year(CDate(valorFecha))
+  End If
+End Function
+%>
+
 <div class="container-fluid" style="margin-top: 20px;">
   <div class="row-fluid">
     <div class="span12">
@@ -70,11 +80,11 @@ if not rsProveedores.EOF then
     fechaFin = ""
     
     if not IsNull(rsProveedores("fecha_inicio")) then
-      fechaInicio = Day(rsProveedores("fecha_inicio")) & "/" & Month(rsProveedores("fecha_inicio")) & "/" & Year(rsProveedores("fecha_inicio"))
+      fechaInicio = FormatearFechaDMY(rsProveedores("fecha_inicio"))
     end if
     
     if not IsNull(rsProveedores("fecha_fin")) then
-      fechaFin = Day(rsProveedores("fecha_fin")) & "/" & Month(rsProveedores("fecha_fin")) & "/" & Year(rsProveedores("fecha_fin"))
+      fechaFin = FormatearFechaDMY(rsProveedores("fecha_fin"))
     end if
 %>
                 <tr>

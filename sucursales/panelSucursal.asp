@@ -1,3 +1,48 @@
+<style type="text/css">
+  .icon-solicitud-cajeros {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    vertical-align: text-top;
+    top: -11px;
+  }
+
+  .icon-solicitud-cajeros-usuario {
+    font-size: 24px;
+    line-height: 28px;
+    color: inherit;
+  }
+
+  .icon-solicitud-cajeros-badge {
+    position: absolute;
+    right: -1px;
+    bottom: 1px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .icon-solicitud-cajeros-circulo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 12px;
+    line-height: 12px;
+    color: inherit;
+  }
+
+  .icon-solicitud-cajeros-flecha {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    font-size: 7px;
+    line-height: 12px;
+    text-align: center;
+    color: #ffffff;
+    margin: 0;
+  }
+</style>
 <div class="well">
   <!--<span id="tabMenu5" class="mano" data-placement="top" title="Mensajes">
 		<i class="icon-comment-alt icon-2x mano"></i>
@@ -48,9 +93,12 @@
     data-placement="left"
     title="Solicitudes de Cajeros Adicionales"
   >
-    <span class="icon-stack icon-2x">
-      <i class="icon-check-empty icon-stack-base"></i>
-      <i class="icon-group"></i>
+    <span class="icon-solicitud-cajeros">
+      <i class="icon-user icon-solicitud-cajeros-usuario"></i>
+      <span class="icon-solicitud-cajeros-badge">
+        <i class="icon-circle icon-solicitud-cajeros-circulo"></i>
+        <i class="icon-arrow-down icon-solicitud-cajeros-flecha"></i>
+      </span>
     </span>
   </span>
   <!--

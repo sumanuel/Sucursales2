@@ -44,6 +44,20 @@ function corregirTexto(texto)
     corregirTexto = resultado
 end function
 
+' Formatear fecha de manera explícita como dd/mm/yyyy
+function formatearFechaDMY(valorFecha)
+    if IsNull(valorFecha) or Trim(CStr(valorFecha)) = "" then
+        formatearFechaDMY = ""
+        exit function
+    end if
+
+    if IsDate(valorFecha) then
+        formatearFechaDMY = Right("0" & Day(CDate(valorFecha)), 2) & "/" & Right("0" & Month(CDate(valorFecha)), 2) & "/" & Year(CDate(valorFecha))
+    else
+        formatearFechaDMY = CStr(valorFecha)
+    end if
+end function
+
 dim fechaDesde, fechaHasta, usuario, perfil, funcionalidad, tipoAccion, page, pageSize
 fechaDesde = trim(request("fecha_desde"))
 fechaHasta = trim(request("fecha_hasta"))
@@ -164,7 +178,7 @@ else
     </td>
     <td><%=Server.HTMLEncode(funcionalidadReg)%></td>
     <td><%=Server.HTMLEncode(tipoAccionReg)%></td>
-    <td><%=FormatDateTime(fechaReg, 2)%></td>
+    <td><%=formatearFechaDMY(fechaReg)%></td>
     <td><%=horaReg%></td>
 </tr>
 <%

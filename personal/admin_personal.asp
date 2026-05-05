@@ -329,8 +329,22 @@ if not rs.eof then
                             </a>
                         </span>
                         &nbsp;&nbsp;
+                        <span class="btnEvaluacionCajeros" id="btnEvaluacionCajeros">
+                            <a class="btn btn-inverse" href="#" style="background-color: #2f6f4f; border-color: #2f6f4f; background-image: none;">
+                                <i class="icon-check icon-large"></i>
+                                &nbsp;<span class="bajaLetra"><b>EVALUACION CAJEROS</b></span>
+                            </a>
+                        </span>
+                        &nbsp;&nbsp;
                         <span class="">
                             <a class="btn btn-warning oculto btnVolverAdmini5" href="#">
+                                <i class="icon-arrow-left icon-large"></i>
+                                &nbsp;<span class="bajaLetra"><b>VOLVER AL INICIO</b></span>
+                            </a>
+                        </span>
+                        &nbsp;&nbsp;
+                        <span class="">
+                            <a class="btn btn-warning oculto btnVolverAdmini6" href="#">
                                 <i class="icon-arrow-left icon-large"></i>
                                 &nbsp;<span class="bajaLetra"><b>VOLVER AL INICIO</b></span>
                             </a>
@@ -363,6 +377,11 @@ if not rs.eof then
                 <div class="row-fluid dvTbSolicitudCajerosAdicionales oculto" id= "dvTbSolicitudCajerosAdicionales">
                     <div class="span1">&nbsp;</div>
                     <div class="span10" id="tbSolicitudCajerosAdicionales"></div>
+                </div>
+                <br/>
+                <div class="row-fluid dvTbEvaluacionCajeros oculto" id="dvTbEvaluacionCajeros">
+                    <div class="span1">&nbsp;</div>
+                    <div class="span10" id="tbEvaluacionCajeros"></div>
                 </div>
 
             </div>
@@ -861,6 +880,9 @@ $('.btnGestionCasos').click(function(){
     $('.btnCuadroDeControl2').addClass('oculto');
     $('.btnGestionProveedores').addClass('oculto');
     $('.btnSolicitudCajerosAdicionales').addClass('oculto');
+    $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
+    $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('.btnEvaluacionCajeros').addClass('oculto');
     $('.btnGestionCasosDetalle').removeClass('oculto');
     $('.btnGestionCasosDetalles').removeClass('btn btn-danger').addClass('btn btn-primary');
 });
@@ -957,6 +979,9 @@ $('.btnCuadroDeControl').click(function(){
     $('.btnCuadroDeControl').addClass('oculto');
     $('.btnGestionProveedores').addClass('oculto');
     $('.btnSolicitudCajerosAdicionales').addClass('oculto');
+    $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
+    $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('.btnEvaluacionCajeros').addClass('oculto');
     $('.btnControlOnline').removeClass('oculto');
     $('.dvTbCuadroDeControl').removeClass('oculto');
     $('.btnVolverAdmini').removeClass('oculto');
@@ -985,6 +1010,9 @@ $('.btnCuadroDeControl2').click(function(){
     $('.btnGestionCasos').addClass('oculto');
     $('.btnGestionProveedores').addClass('oculto');
     $('.btnSolicitudCajerosAdicionales').addClass('oculto');
+    $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
+    $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('.btnEvaluacionCajeros').addClass('oculto');
     $('.dvTbCuadroDeControl').removeClass('oculto');
     $('.btnVolverAdmini2').removeClass('oculto');
     $('.btnCuadroControlAdMes').removeClass('oculto');
@@ -1014,6 +1042,9 @@ $('.btnGestionProveedores').click(function(){
     $('.btnCuadroDeControl2').addClass('oculto');
     $('.btnGestionProveedores').addClass('oculto');
     $('.btnSolicitudCajerosAdicionales').addClass('oculto');
+    $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
+    $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('.btnEvaluacionCajeros').addClass('oculto');
     $('.dvTbGestionProveedores').removeClass('oculto');
     $('.btnVolverAdmini4').removeClass('oculto');
     $('#Central_Columna_mensual').addClass('oculto');
@@ -1040,6 +1071,7 @@ $('.btnSolicitudCajerosAdicionales').click(function(){
     $('.btnSolicitudCajerosAdicionales').addClass('oculto');
     $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('.btnEvaluacionCajeros').addClass('oculto');
     $('.dvTbSolicitudCajerosAdicionales').removeClass('oculto');
     $('.btnVolverAdmini5').removeClass('oculto');
     $('#Central_Columna_mensual').addClass('oculto');
@@ -1067,6 +1099,7 @@ $('.btnSolicitudRebajaCajerosAdicionales').click(function(){
     $('.btnVolverAdmini5').removeClass('oculto');
     $('#Central_Columna_mensual').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('.btnEvaluacionCajeros').addClass('oculto');
     $('#tbSolicitudCajerosAdicionales').html('');
     var div = 'tbSolicitudCajerosAdicionales';
     var datos = '';
@@ -1088,6 +1121,7 @@ $('.btnPreguntasCapacitacionCajeros').click(function(){
     $('.btnSolicitudCajerosAdicionales').addClass('oculto');
     $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('.btnEvaluacionCajeros').addClass('oculto');
     $('.dvTbSolicitudCajerosAdicionales').removeClass('oculto');
     $('.btnVolverAdmini5').removeClass('oculto');
     $('#Central_Columna_mensual').addClass('oculto');
@@ -1108,7 +1142,32 @@ $('.btnPreguntasCapacitacionCajeros').click(function(){
     enviaDatos(pagina, div, datos);
 });
 
+$('.btnEvaluacionCajeros').click(function(){
+    $('.btnGestionCasos').addClass('oculto');
+    $('.btnCuadroDeControl').addClass('oculto');
+    $('.btnCuadroDeControl2').addClass('oculto');
+    $('.btnGestionProveedores').addClass('oculto');
+    $('.btnSolicitudCajerosAdicionales').addClass('oculto');
+    $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
+    $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('.btnEvaluacionCajeros').addClass('oculto');
+    $('.dvTbEvaluacionCajeros').removeClass('oculto');
+    $('.btnVolverAdmini6').removeClass('oculto');
+    $('#Central_Columna_mensual').addClass('oculto');
+
+    $('#tbEvaluacionCajeros').html('');
+    var div = 'tbEvaluacionCajeros';
+    var datos = '';
+    var pagina = 'evaluacion_cajeros.asp';
+
+    enviaDatos(pagina, div, datos);
+});
+
 $('.btnVolverAdmini5').click(function(){
+    location.reload();
+});
+
+$('.btnVolverAdmini6').click(function(){
     location.reload();
 });
 

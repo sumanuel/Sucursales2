@@ -1,4 +1,4 @@
-﻿<!--#include file="../conexion/conexion.asp"-->
+<!--#include file="../conexion/conexion.asp"-->
 
 <%
 Function FormatearFechaDMY(valorFecha)
@@ -36,6 +36,7 @@ End Function
                 <div class="span4">
                   <label style="font-weight: bold; margin-bottom: 3px;">Archivo CSV</label>
                   <input type="file" name="archivo_evaluacion" id="archivo_evaluacion" class="span12" accept=".csv" />
+                  <div id="infoArchivoEvaluacion" class="help-block" style="margin-top: 6px; color: #666;"></div>
                 </div>
                 <div class="span5">
                   <label style="font-weight: bold; margin-bottom: 3px;">Comentario</label>
@@ -150,14 +151,74 @@ function escaparHtmlEvaluacion(texto) {
   return $("<div/>").text(texto || "").html();
 }
 
+function formatearTamanoArchivo(bytes) {
+  var kilo = 1024;
+  var mega = kilo * 1024;
+  if (bytes >= mega) {
+    return (bytes / mega).toFixed(2) + ' MB';
+  }
+  if (bytes >= kilo) {
+    return (bytes / kilo).toFixed(2) + ' KB';
+  }
+  return bytes + ' B';
+}
+
+function onEvaluacionCajerosUploadCompleto(resultado) {
+  var html = '';
+
+  if (resultado.resultado !== 'OK') {
+    html += '<div class="alert alert-error">';
+    html += '<h4 style="margin-top:0;">Error al subir archivo</h4>';
+    html += '<p>' + escaparHtmlEvaluacion(resultado.mensaje || 'No fue posible subir el archivo.') + '</p>';
+    html += '</div>';
+    $("#resultadoCargaEvaluacionCajeros").html(html);
+    return;
+  }
+
+  html += '<div class="alert alert-info">';
+  html += '<h4 style="margin-top:0;">Archivo subido correctamente</h4>';
+  html += '<p><strong>Archivo:</strong> ' + escaparHtmlEvaluacion(resultado.archivo) + ' (' + escaparHtmlEvaluacion(resultado.peso) + ')</p>';
+  html += '<p><i class="icon-spinner icon-spin"></i> Procesando registros...</p>';
+  html += '</div>';
+  $("#resultadoCargaEvaluacionCajeros").html(html);
+
+  $.ajax({
+    url: 'evaluacion_cajeros_procesar.asp',
+    type: 'POST',
+    dataType: 'json',
+    cache: false,
+    data: {
+      eva_com: $("#eva_com").val()
+    },
+    success: function(respuesta) {
+      onEvaluacionCajerosCargaCompleta(respuesta);
+    },
+    error: function(xhr) {
+      var mensaje = 'Error al procesar el archivo cargado.';
+      if (xhr && xhr.responseText) {
+        mensaje = xhr.responseText;
+      }
+      $("#resultadoCargaEvaluacionCajeros").html('<div class="alert alert-error"><h4 style="margin-top:0;">Error al procesar</h4><pre style="white-space:pre-wrap;">' + escaparHtmlEvaluacion(mensaje) + '</pre></div>');
+    }
+  });
+}
+
 function onEvaluacionCajerosCargaCompleta(resultado) {
-  var html = "";
-  var clase = resultado.resultado === "OK" ? "alert-success" : "alert-error";
+  var html = '';
+  var clase = resultado.resultado === 'OK' ? 'alert-success' : 'alert-error';
   var i = 0;
 
   html += '<div class="alert ' + clase + '">';
   html += '<h4 style="margin-top:0;">Resultado de la carga</h4>';
   html += '<p><strong>Insertados:</strong> ' + resultado.insertados + ' | <strong>Errores:</strong> ' + resultado.errores + '</p>';
+
+  if (resultado.archivo && resultado.archivo !== '') {
+    html += '<p><strong>Archivo:</strong> ' + escaparHtmlEvaluacion(resultado.archivo);
+    if (resultado.peso && resultado.peso !== '') {
+      html += ' (' + escaparHtmlEvaluacion(resultado.peso) + ')';
+    }
+    html += '</p>';
+  }
 
   if (resultado.mensajes && resultado.mensajes.length > 0) {
     html += '<ol style="margin-bottom:0;">';
@@ -167,20 +228,33 @@ function onEvaluacionCajerosCargaCompleta(resultado) {
     html += '</ol>';
   }
 
+  html += '<div style="margin-top:12px;">';
+  html += '<button type="button" class="btn btn-info" onclick="recargarPantallaEvaluacionCajeros();">Actualizar listado</button>';
+  html += '</div>';
+
   html += '</div>';
   $("#resultadoCargaEvaluacionCajeros").html(html);
   $("#frmCargaEvaluacionCajeros")[0].reset();
-  recargarPantallaEvaluacionCajeros();
+  $("#infoArchivoEvaluacion").html('');
 }
 
 $(document).ready(function() {
+  $("#archivo_evaluacion").on("change", function() {
+    var info = '';
+    var archivo = this.files && this.files.length > 0 ? this.files[0] : null;
+    if (archivo) {
+      info = 'Seleccionado: ' + archivo.name + ' (' + formatearTamanoArchivo(archivo.size || 0) + ')';
+    }
+    $("#infoArchivoEvaluacion").html(info);
+  });
+
   $("#frmCargaEvaluacionCajeros").on("submit", function() {
-    if ($("#archivo_evaluacion").val() === "") {
-      alert("Seleccione un archivo CSV para continuar.");
+    if ($("#archivo_evaluacion").val() === '') {
+      alert('Seleccione un archivo CSV para continuar.');
       return false;
     }
 
-    $("#resultadoCargaEvaluacionCajeros").html('<div class="alert alert-info"><i class="icon-spinner icon-spin"></i> Procesando archivo...</div>');
+    $("#resultadoCargaEvaluacionCajeros").html('<div class="alert alert-info"><i class="icon-spinner icon-spin"></i> Subiendo archivo...</div>');
     return true;
   });
 });

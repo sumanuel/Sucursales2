@@ -78,9 +78,9 @@ BEGIN
             RETURN;
         END;
 
-        IF LEN(@EVA_NOMBRE) > 10
+        IF LEN(@EVA_NOMBRE) > 100
         BEGIN
-            SELECT 'ERROR' AS resultado, 'El nombre excede el largo permitido de la columna EVA_NOMBRE (10). Ajuste la tabla o reduzca el valor.' AS mensaje, CAST(@ID_EVA AS INT) AS id_eva;
+            SELECT 'ERROR' AS resultado, 'El nombre excede el largo permitido de la columna EVA_NOMBRE (100). Ajuste la tabla o reduzca el valor.' AS mensaje, CAST(@ID_EVA AS INT) AS id_eva;
             RETURN;
         END;
 
@@ -141,6 +141,6 @@ GO
 
 /*
 Nota:
-- La tabla definida actualmente usa EVA_NOMBRE VARCHAR(10).
-- Si se requiere editar nombres mas largos, primero ajustar la columna.
+- La validacion del SP para EVA_NOMBRE esta alineada a 100 caracteres.
+- Si se requiere editar nombres mas largos, ajustar la tabla y este SP.
 */

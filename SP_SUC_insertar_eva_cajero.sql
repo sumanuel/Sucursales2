@@ -65,9 +65,9 @@ BEGIN
             RETURN;
         END;
 
-        IF LEN(@EVA_NOMBRE) > 10
+        IF LEN(@EVA_NOMBRE) > 100
         BEGIN
-            SELECT 'ERROR' AS resultado, 'El nombre excede el largo permitido de la columna EVA_NOMBRE (10). Ajuste la tabla o reduzca el valor.' AS mensaje, CAST(NULL AS INT) AS id_eva;
+            SELECT 'ERROR' AS resultado, 'El nombre excede el largo permitido de la columna EVA_NOMBRE (100). Ajuste la tabla o reduzca el valor.' AS mensaje, CAST(NULL AS INT) AS id_eva;
             RETURN;
         END;
 
@@ -141,10 +141,10 @@ GO
 
 /*
 Nota:
-- La tabla definida actualmente usa EVA_NOMBRE VARCHAR(10).
+- La validacion del SP para EVA_NOMBRE esta alineada a 100 caracteres.
 - El CSV de ejemplo contiene nombres bastante mas largos.
-- Si quieres permitir esos nombres sin error, primero ajusta la columna:
+- Si quieres permitir mas de 100 caracteres, ajusta la tabla y este SP:
 
 ALTER TABLE dbo.SUC_CAP_EVA
-ALTER COLUMN EVA_NOMBRE VARCHAR(150) NULL;
+ALTER COLUMN EVA_NOMBRE VARCHAR(100) NULL;
 */

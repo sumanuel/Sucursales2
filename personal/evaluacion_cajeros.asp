@@ -66,9 +66,27 @@
   <div class="row-fluid">
     <div class="span12">
       <div class="well">
-        <div class="row-fluid">
+        <div class="row-fluid" style="margin-bottom: 12px">
           <div class="span12">
-            <h4 style="margin-top: 0">Ultimas evaluaciones cargadas</h4>
+            <h4 style="margin-top: 0; margin-bottom: 10px">Evaluaciones cargadas</h4>
+          </div>
+        </div>
+        <div class="row-fluid" style="margin-bottom: 15px">
+          <div class="span3">
+            <label style="font-weight: bold; margin-bottom: 3px">Desde</label>
+            <input type="date" id="filtro_eva_desde" class="span12" />
+          </div>
+          <div class="span3">
+            <label style="font-weight: bold; margin-bottom: 3px">Hasta</label>
+            <input type="date" id="filtro_eva_hasta" class="span12" />
+          </div>
+          <div class="span6" style="padding-top: 23px; text-align: right">
+            <button type="button" class="btn btn-primary" id="btnFiltrarEvaluacionCajeros">
+              <i class="icon-search icon-white"></i> Filtrar
+            </button>
+            <button type="button" class="btn" id="btnMesActualEvaluacionCajeros">
+              Mes actual
+            </button>
           </div>
         </div>
         <div id="contenedorListadoEvaluacionCajeros">
@@ -168,13 +186,62 @@
     return bytes + " B";
   }
 
+  function formatearFechaInputEvaluacion(fecha) {
+    var anio = fecha.getFullYear();
+    var mes = ("0" + (fecha.getMonth() + 1)).slice(-2);
+    var dia = ("0" + fecha.getDate()).slice(-2);
+    return anio + "-" + mes + "-" + dia;
+  }
+
+  function establecerFiltroMesActualEvaluacion() {
+    var hoy = new Date();
+    $("#filtro_eva_desde").val(
+      formatearFechaInputEvaluacion(new Date(hoy.getFullYear(), hoy.getMonth(), 1)),
+    );
+    $("#filtro_eva_hasta").val(
+      formatearFechaInputEvaluacion(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0)),
+    );
+  }
+
+  function obtenerFiltrosEvaluacionCajeros() {
+    return {
+      fch_desde: $.trim($("#filtro_eva_desde").val() || ""),
+      fch_hasta: $.trim($("#filtro_eva_hasta").val() || ""),
+    };
+  }
+
+  function validarFiltroEvaluacionCajeros() {
+    var filtros = obtenerFiltrosEvaluacionCajeros();
+    if (
+      filtros.fch_desde !== "" &&
+      filtros.fch_hasta !== "" &&
+      filtros.fch_desde > filtros.fch_hasta
+    ) {
+      alert("La fecha Desde no puede ser mayor que la fecha Hasta.");
+      return false;
+    }
+    return true;
+  }
+
   function cargarListadoEvaluacionCajeros(pagina) {
     var paginaActual = pagina || 1;
+    var filtros = obtenerFiltrosEvaluacionCajeros();
+    var params = {
+      page: paginaActual,
+    };
+
+    if (filtros.fch_desde !== "") {
+      params.fch_desde = filtros.fch_desde;
+    }
+    if (filtros.fch_hasta !== "") {
+      params.fch_hasta = filtros.fch_hasta;
+    }
+
     $("#contenedorListadoEvaluacionCajeros").html(
       '<div class="alert alert-info">Consultando evaluaciones...</div>',
     );
     $("#contenedorListadoEvaluacionCajeros").load(
-      "evaluacion_cajeros_listado.asp?page=" + encodeURIComponent(paginaActual),
+      "evaluacion_cajeros_listado.asp?" + $.param(params),
       function (respuesta, estado) {
         if (estado !== "success") {
           $("#contenedorListadoEvaluacionCajeros").html(
@@ -286,6 +353,22 @@
     $("#infoArchivoEvaluacion").html("");
     cargarListadoEvaluacionCajeros();
   }
+
+  $(document)
+    .off("click", "#btnFiltrarEvaluacionCajeros")
+    .on("click", "#btnFiltrarEvaluacionCajeros", function () {
+      if (!validarFiltroEvaluacionCajeros()) {
+        return;
+      }
+      cargarListadoEvaluacionCajeros(1);
+    });
+
+  $(document)
+    .off("click", "#btnMesActualEvaluacionCajeros")
+    .on("click", "#btnMesActualEvaluacionCajeros", function () {
+      establecerFiltroMesActualEvaluacion();
+      cargarListadoEvaluacionCajeros(1);
+    });
 
   $(document)
     .off("click", ".btn-pagina-evaluacion")
@@ -494,5 +577,6 @@
       return true;
     });
 
+  establecerFiltroMesActualEvaluacion();
   cargarListadoEvaluacionCajeros();
 </script>

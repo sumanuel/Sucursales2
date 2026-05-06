@@ -11,16 +11,31 @@ CREATE PROCEDURE [dbo].[SP_SUC_listar_ges_eva_cajero]
     @EVA_EST       SMALLINT = NULL,
     @EVA_SUC       INT = NULL,
     @EVA_RUT       VARCHAR(10) = NULL,
-    @TOP_REGISTROS INT = 100
+    @TOP_REGISTROS INT = 100,
+    @FCH_DESDE     DATE = NULL,
+    @FCH_HASTA     DATE = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
+        DECLARE @INICIO_MES_ACTUAL DATE;
+        DECLARE @FIN_MES_ACTUAL DATE;
+        DECLARE @FECHA_AUX DATE;
+
         SET @EVA_RUT = LTRIM(RTRIM(ISNULL(@EVA_RUT, '')));
+        SET @INICIO_MES_ACTUAL = DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1);
+        SET @FIN_MES_ACTUAL = EOMONTH(GETDATE());
 
         IF @TOP_REGISTROS IS NULL OR @TOP_REGISTROS <= 0
             SET @TOP_REGISTROS = 100;
+
+        IF @FCH_DESDE IS NOT NULL AND @FCH_HASTA IS NOT NULL AND @FCH_DESDE > @FCH_HASTA
+        BEGIN
+            SET @FECHA_AUX = @FCH_DESDE;
+            SET @FCH_DESDE = @FCH_HASTA;
+            SET @FCH_HASTA = @FECHA_AUX;
+        END
 
         SELECT TOP (@TOP_REGISTROS)
             ID_EVA,
@@ -45,6 +60,20 @@ BEGIN
           AND (@EVA_EST IS NULL OR EVA_EST = @EVA_EST)
           AND (@EVA_SUC IS NULL OR EVA_SUC = @EVA_SUC)
           AND (@EVA_RUT = '' OR EVA_RUT = @EVA_RUT)
+          AND (
+              @ID_EVA IS NOT NULL
+              OR (
+                  @FCH_DESDE IS NULL
+                  AND @FCH_HASTA IS NULL
+                  AND EVA_FCH_DES <= @FIN_MES_ACTUAL
+                  AND EVA_FCH_HAS >= @INICIO_MES_ACTUAL
+              )
+              OR (
+                  (@FCH_DESDE IS NOT NULL OR @FCH_HASTA IS NOT NULL)
+                  AND EVA_FCH_DES <= ISNULL(@FCH_HASTA, CONVERT(DATE, '99991231'))
+                  AND EVA_FCH_HAS >= ISNULL(@FCH_DESDE, CONVERT(DATE, '19000101'))
+              )
+          )
         ORDER BY ID_EVA DESC;
     END TRY
     BEGIN CATCH

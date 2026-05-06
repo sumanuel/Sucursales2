@@ -6,7 +6,7 @@ IF OBJECT_ID('dbo.SP_SUC_eliminar_eva_cajero', 'P') IS NOT NULL
     DROP PROCEDURE dbo.SP_SUC_eliminar_eva_cajero;
 GO
 
-CREATE PROCEDURE dbo.SP_SUC_eliminar_ges_eva_cajero
+CREATE PROCEDURE [dbo].[SP_SUC_eliminar_ges_eva_cajero]
     @ID_EVA  INT,
     @EVA_USR VARCHAR(50) = NULL
 AS
@@ -28,11 +28,13 @@ BEGIN
             RETURN;
         END;
 
-        UPDATE dbo.SUC_CAP_EVA
-        SET EVA_EST = 0,
-            EVA_USR = CASE WHEN @EVA_USR = '' THEN EVA_USR ELSE @EVA_USR END,
-            EVA_FCH = GETDATE()
-        WHERE ID_EVA = @ID_EVA;
+		IF EXISTS (SELECT 1 FROM dbo.SUC_CAP_EVA WHERE ID_EVA = @ID_EVA AND EVA_EST<>1)
+        BEGIN
+            SELECT 'ERROR' AS resultado, 'Solo se pueden eliminar evaluación esta estado de CAPACITACION.' AS mensaje, CAST(@ID_EVA AS INT) AS id_eva;
+            RETURN;
+        END;
+
+       DELETE FROM dbo.SUC_CAP_EVA WHERE ID_EVA = @ID_EVA;
 
         SELECT 'OK' AS resultado, 'Registro eliminado correctamente.' AS mensaje, CAST(@ID_EVA AS INT) AS id_eva;
     END TRY

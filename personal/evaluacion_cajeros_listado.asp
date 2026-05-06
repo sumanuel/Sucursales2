@@ -56,11 +56,22 @@ Function PermiteAccion(valorEstado)
   PermiteAccion = (UCase(Trim(valorEstado & "")) = "EN CAPACITACION")
 End Function
 
+Function FormatearFechaSQL(valorFecha)
+  If Trim(valorFecha & "") = "" Then
+    FormatearFechaSQL = ""
+  ElseIf Not IsDate(valorFecha) Then
+    FormatearFechaSQL = ""
+  Else
+    FormatearFechaSQL = Year(CDate(valorFecha)) & "-" & Right("0" & Month(CDate(valorFecha)), 2) & "-" & Right("0" & Day(CDate(valorFecha)), 2)
+  End If
+End Function
+
 Dim rsEva, sqlEva, datosEva
 Dim paginaActual, tamanoPagina, totalRegistros, totalPaginas
 Dim inicioIndice, finIndice, i
 Dim idxIdEva, idxRut, idxNombre, idxSuc, idxEmp, idxFchDes, idxFchHas, idxEstado, idxUsr, idxFch
 Dim idEva, estadoTexto, htmlPag, inicioRango, finRango
+Dim filtroDesde, filtroHasta, mensajeSinDatos, etiquetaFiltro
 
 paginaActual = 1
 If Trim(Request("page") & "") <> "" And IsNumeric(Request("page")) Then
@@ -68,8 +79,17 @@ If Trim(Request("page") & "") <> "" And IsNumeric(Request("page")) Then
 End If
 If paginaActual <= 0 Then paginaActual = 1
 
+filtroDesde = FormatearFechaSQL(Request("fch_desde"))
+filtroHasta = FormatearFechaSQL(Request("fch_hasta"))
+
 tamanoPagina = 10
 sqlEva = "EXEC dbo.SP_SUC_listar_ges_eva_cajero @TOP_REGISTROS = 5000"
+If filtroDesde <> "" Then
+  sqlEva = sqlEva & ", @FCH_DESDE = '" & filtroDesde & "'"
+End If
+If filtroHasta <> "" Then
+  sqlEva = sqlEva & ", @FCH_HASTA = '" & filtroHasta & "'"
+End If
 Set rsEva = db.Execute(sqlEva)
 
 If Err.Number <> 0 Then
@@ -77,8 +97,27 @@ If Err.Number <> 0 Then
   Response.End
 End If
 
+If filtroDesde <> "" Or filtroHasta <> "" Then
+  etiquetaFiltro = "<div class=""alert alert-info"" style=""margin-bottom: 12px""><strong>Filtro aplicado:</strong> "
+  If filtroDesde <> "" Then
+    etiquetaFiltro = etiquetaFiltro & "Desde " & TextoSeguro(FormatearFechaDMY(filtroDesde))
+  End If
+  If filtroDesde <> "" And filtroHasta <> "" Then
+    etiquetaFiltro = etiquetaFiltro & " | "
+  End If
+  If filtroHasta <> "" Then
+    etiquetaFiltro = etiquetaFiltro & "Hasta " & TextoSeguro(FormatearFechaDMY(filtroHasta))
+  End If
+  etiquetaFiltro = etiquetaFiltro & "</div>"
+  mensajeSinDatos = "No hay evaluaciones registradas para el rango seleccionado"
+Else
+  etiquetaFiltro = "<div class=""alert alert-info"" style=""margin-bottom: 12px"">Mostrando evaluaciones del mes actual.</div>"
+  mensajeSinDatos = "No hay evaluaciones registradas en el mes actual"
+End If
+
 If rsEva.EOF Then
-  Response.Write "<table class=""table table-bordered table-hover""><thead><tr style=""background-color: #f5f5f5""><th>Rut</th><th>Nombre</th><th>Sucursal</th><th>Empresa</th><th>Desde</th><th>Hasta</th><th>Estado</th><th>Usuario</th><th>Fecha Registro</th><th style=""width: 70px; text-align: center"">Acciones</th></tr></thead><tbody><tr><td colspan=""10"" style=""text-align: center"">No hay evaluaciones registradas</td></tr></tbody></table>"
+  Response.Write etiquetaFiltro
+  Response.Write "<table class=""table table-bordered table-hover""><thead><tr style=""background-color: #f5f5f5""><th>Rut</th><th>Nombre</th><th>Sucursal</th><th>Empresa</th><th>Desde</th><th>Hasta</th><th>Estado</th><th>Usuario</th><th>Fecha Registro</th><th style=""width: 70px; text-align: center"">Acciones</th></tr></thead><tbody><tr><td colspan=""10"" style=""text-align: center"">" & TextoSeguro(mensajeSinDatos) & "</td></tr></tbody></table>"
   Response.End
 End If
 
@@ -132,6 +171,7 @@ Response.Write ".estado-evaluacion-rechazada{background-color:#d9534f;}"
 Response.Write ".estado-evaluacion-default{background-color:#999;}"
 Response.Write ".paginacion-evaluacion{text-align:center;margin-top:15px;}"
 Response.Write "</style>"
+Response.Write etiquetaFiltro
 Response.Write "<table class=""table table-bordered table-hover""><thead><tr style=""background-color: #f5f5f5""><th>Rut</th><th>Nombre</th><th>Sucursal</th><th>Empresa</th><th>Desde</th><th>Hasta</th><th>Estado</th><th>Usuario</th><th>Fecha Registro</th><th style=""width: 70px; text-align: center"">Acciones</th></tr></thead><tbody>"
 
 For i = inicioIndice To finIndice

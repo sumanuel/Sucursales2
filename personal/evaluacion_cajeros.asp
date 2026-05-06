@@ -23,7 +23,7 @@
               style="margin-bottom: 20px"
             >
               <div class="row-fluid">
-                <div class="span4">
+                <div class="span8">
                   <label style="font-weight: bold; margin-bottom: 3px"
                     >Archivo CSV</label
                   >
@@ -40,20 +40,7 @@
                     style="margin-top: 6px; color: #666"
                   ></div>
                 </div>
-                <div class="span5">
-                  <label style="font-weight: bold; margin-bottom: 3px"
-                    >Comentario</label
-                  >
-                  <input
-                    type="text"
-                    name="eva_com"
-                    id="eva_com"
-                    class="span12"
-                    maxlength="250"
-                    placeholder="Comentario opcional para todas las filas"
-                  />
-                </div>
-                <div class="span3" style="padding-top: 23px; text-align: right">
+                <div class="span4" style="padding-top: 23px; text-align: right">
                   <button
                     type="submit"
                     class="btn btn-success"
@@ -80,17 +67,8 @@
     <div class="span12">
       <div class="well">
         <div class="row-fluid">
-          <div class="span6">
+          <div class="span12">
             <h4 style="margin-top: 0">Ultimas evaluaciones cargadas</h4>
-          </div>
-          <div class="span6" style="text-align: right; padding-top: 6px">
-            <button
-              type="button"
-              class="btn btn-info"
-              id="btnRefrescarListadoEvaluacion"
-            >
-              <i class="icon-refresh icon-white"></i> Actualizar listado
-            </button>
           </div>
         </div>
         <div id="contenedorListadoEvaluacionCajeros">
@@ -190,12 +168,13 @@
     return bytes + " B";
   }
 
-  function cargarListadoEvaluacionCajeros() {
+  function cargarListadoEvaluacionCajeros(pagina) {
+    var paginaActual = pagina || 1;
     $("#contenedorListadoEvaluacionCajeros").html(
       '<div class="alert alert-info">Consultando evaluaciones...</div>',
     );
     $("#contenedorListadoEvaluacionCajeros").load(
-      "evaluacion_cajeros_listado.asp",
+      "evaluacion_cajeros_listado.asp?page=" + encodeURIComponent(paginaActual),
       function (respuesta, estado) {
         if (estado !== "success") {
           $("#contenedorListadoEvaluacionCajeros").html(
@@ -250,7 +229,7 @@
       dataType: "json",
       cache: false,
       data: {
-        eva_com: $("#eva_com").val(),
+        eva_com: "",
       },
       success: function (respuesta) {
         onEvaluacionCajerosCargaCompleta(respuesta);
@@ -309,9 +288,10 @@
   }
 
   $(document)
-    .off("click", "#btnRefrescarListadoEvaluacion")
-    .on("click", "#btnRefrescarListadoEvaluacion", function () {
-      cargarListadoEvaluacionCajeros();
+    .off("click", ".btn-pagina-evaluacion")
+    .on("click", ".btn-pagina-evaluacion", function (e) {
+      e.preventDefault();
+      cargarListadoEvaluacionCajeros($(this).data("pagina"));
     });
 
   $(document)

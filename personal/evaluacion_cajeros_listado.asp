@@ -1,10 +1,16 @@
 <!--#include file="../conexion/conexion.asp"-->
 <% Function FormatearFechaDMY(valorFecha) If IsNull(valorFecha) Or
 Trim(CStr(valorFecha)) = "" Then FormatearFechaDMY = "" Else FormatearFechaDMY =
-Right("0" & Day(CDate(valorFecha)), 2) & "/" & Right("0" &
-Month(CDate(valorFecha)), 2) & "/" & Year(CDate(valorFecha)) End If End Function
-Function TextoSeguro(valor) If IsNull(valor) Then TextoSeguro = "" Else
-TextoSeguro = Server.HTMLEncode(CStr(valor)) End If End Function %>
+Right("0" & Day(CDate(valorFecha)), 2) & "-" & Right("0" &
+Month(CDate(valorFecha)), 2) & "-" & Year(CDate(valorFecha)) End If End Function
+Function FormatearFechaRegistro(valorFecha) If IsNull(valorFecha) Or
+Trim(CStr(valorFecha)) = "" Then FormatearFechaRegistro = "" Else
+FormatearFechaRegistro = Right("0" & Day(CDate(valorFecha)), 2) & "-" &
+Right("0" & Month(CDate(valorFecha)), 2) & "-" & Year(CDate(valorFecha)) & " " &
+Right("0" & Hour(CDate(valorFecha)), 2) & ":" & Right("0" &
+Minute(CDate(valorFecha)), 2) End If End Function Function TextoSeguro(valor) If
+IsNull(valor) Then TextoSeguro = "" Else TextoSeguro =
+Server.HTMLEncode(CStr(valor)) End If End Function %>
 <style type="text/css">
   .estado-evaluacion {
     display: inline-block;
@@ -50,7 +56,7 @@ TextoSeguro = Server.HTMLEncode(CStr(valor)) End If End Function %>
   <tbody>
     <% On Error Resume Next Dim rsEva Dim sqlEva Dim estadoTexto Dim idEva Dim
     esActivo Dim estadoValor Dim estadoClase sqlEva = "EXEC
-    dbo.SP_SUC_listar_eva_cajero @TOP_REGISTROS = 100" Set rsEva =
+    dbo.SP_SUC_listar_ges_eva_cajero @TOP_REGISTROS = 100" Set rsEva =
     db.Execute(sqlEva) If Err.Number <> 0 Then %>
     <tr>
       <td colspan="11" style="color: red; text-align: center">
@@ -80,7 +86,7 @@ TextoSeguro = Server.HTMLEncode(CStr(valor)) End If End Function %>
         >
       </td>
       <td><%=TextoSeguro(rsEva("EVA_USR"))%></td>
-      <td><%=TextoSeguro(rsEva("EVA_FCH"))%></td>
+      <td><%=TextoSeguro(FormatearFechaRegistro(rsEva("EVA_FCH")))%></td>
       <td style="text-align: center; white-space: nowrap">
         <% If esActivo Then %>
         <a

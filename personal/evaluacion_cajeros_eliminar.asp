@@ -28,7 +28,7 @@ If usuario = "" Then usuario = "sistema"
 Set cmd = Server.CreateObject("ADODB.Command")
 cmd.ActiveConnection = db
 cmd.CommandType = 4
-cmd.CommandText = "SP_SUC_eliminar_eva_cajero"
+cmd.CommandText = "SP_SUC_eliminar_ges_eva_cajero"
 cmd.Parameters.Append cmd.CreateParameter("@ID_EVA", 3, 1, , CInt(id))
 cmd.Parameters.Append cmd.CreateParameter("@EVA_USR", 200, 1, 50, usuario)
 

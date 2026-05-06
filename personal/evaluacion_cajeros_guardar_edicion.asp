@@ -35,7 +35,7 @@ If usuario = "" Then usuario = "sistema"
 Set cmd = Server.CreateObject("ADODB.Command")
 cmd.ActiveConnection = db
 cmd.CommandType = 4
-cmd.CommandText = "SP_SUC_actualizar_eva_cajero"
+cmd.CommandText = "SP_SUC_actualizar_ges_eva_cajero"
 cmd.Parameters.Append cmd.CreateParameter("@ID_EVA", 3, 1, , CInt(id))
 cmd.Parameters.Append cmd.CreateParameter("@EVA_FCH_DES", 7, 1, , CDate(fechaDesde))
 cmd.Parameters.Append cmd.CreateParameter("@EVA_FCH_HAS", 7, 1, , CDate(fechaHasta))

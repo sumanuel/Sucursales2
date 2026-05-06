@@ -4,7 +4,9 @@
       <div class="well">
         <div class="row-fluid">
           <div class="span12">
-            <h3 style="color: #2f6f4f; margin-top: 0">Evaluacion de Cajeros</h3>
+            <h3 style="color: #2f6f4f; margin-top: 0">
+              Gestión de Cajeros a Evaluar
+            </h3>
             <hr />
             <div class="alert alert-info" style="margin-bottom: 20px">
               <strong>Formato esperado del CSV:</strong>

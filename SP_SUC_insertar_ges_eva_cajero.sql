@@ -107,11 +107,10 @@ BEGIN
             RETURN;
         END;
 
-		IF NOT EXISTS (
+        IF NOT EXISTS (
             SELECT 1
             FROM dbo.SUC_sucursal
             WHERE cod_bantotal = @EVA_SUC
-
         )
         BEGIN
             SELECT 'ERROR' AS resultado, 'La sucursal ingresada no existe en nuestra base de datos.' AS mensaje, CAST(NULL AS INT) AS id_eva;
@@ -151,5 +150,4 @@ BEGIN
         SELECT 'ERROR' AS resultado, ERROR_MESSAGE() AS mensaje, CAST(NULL AS INT) AS id_eva;
     END CATCH
 END;
-
 GO

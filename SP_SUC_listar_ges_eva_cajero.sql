@@ -40,7 +40,7 @@ BEGIN
             EVA_USR,
             EVA_FCH
         FROM dbo.SUC_CAP_EVA eva
-		INNER JOIN dbo.SUC_sucursal suc ON eva.EVA_SUC = suc.cod_bantotal
+        INNER JOIN dbo.SUC_sucursal suc ON eva.EVA_SUC = suc.cod_bantotal
         WHERE (@ID_EVA IS NULL OR ID_EVA = @ID_EVA)
           AND (@EVA_EST IS NULL OR EVA_EST = @EVA_EST)
           AND (@EVA_SUC IS NULL OR EVA_SUC = @EVA_SUC)

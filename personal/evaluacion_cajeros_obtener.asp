@@ -39,7 +39,7 @@ If idEva <= 0 Then
   Response.End
 End If
 
-sqlEva = "EXEC dbo.SP_SUC_listar_eva_cajero @ID_EVA = " & idEva & ", @TOP_REGISTROS = 1"
+sqlEva = "EXEC dbo.SP_SUC_listar_ges_eva_cajero @ID_EVA = " & idEva & ", @TOP_REGISTROS = 1"
 Set rsEva = db.Execute(sqlEva)
 
 If rsEva.EOF Then

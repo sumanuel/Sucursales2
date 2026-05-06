@@ -206,7 +206,7 @@ Do Until archivoTexto.AtEndOfStream
                     Set cmd.ActiveConnection = db
                     cmd.NamedParameters = True
                     cmd.CommandType = 4
-                    cmd.CommandText = "SP_SUC_insertar_eva_cajero"
+                    cmd.CommandText = "SP_SUC_insertar_ges_eva_cajero"
                     cmd.Parameters.Append cmd.CreateParameter("@EVA_RUT", 200, 1, 10, rutEva)
                     cmd.Parameters.Append cmd.CreateParameter("@EVA_NOMBRE", 200, 1, 150, nombreEva)
                     cmd.Parameters.Append cmd.CreateParameter("@EVA_SUC", 3, 1, , sucursalEva)
@@ -225,7 +225,7 @@ Do Until archivoTexto.AtEndOfStream
                         errores = errores + 1
                         totalMensajes = totalMensajes + 1
                         ReDim Preserve mensajes(totalMensajes)
-                        mensajes(totalMensajes) = "Linea " & lineaActual & ": error al ejecutar SP_SUC_insertar_eva_cajero - " & Err.Description
+                        mensajes(totalMensajes) = "Linea " & lineaActual & ": error al ejecutar SP_SUC_insertar_ges_eva_cajero - " & Err.Description
                         Err.Clear
                     Else
                         resultadoSp = "OK"

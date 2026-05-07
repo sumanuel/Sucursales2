@@ -86,24 +86,24 @@ If Not rsPreguntas.EOF Then
   End If
 End If
 %>
-<div class="row-fluid span12">
+<div class="row-fluid">
   <div class="row-fluid">
     <span class="span12 alert alert-success">
       <strong>
         <h4>
           <i class="icon-check-sign"></i>
-          EvaluaciÃ³n Cajeros
+          Evaluacion Cajeros
         </h4>
       </strong>
       <div>Sucursal actual: <strong><%=TextoSeguro(nombreSucursal)%></strong></div>
-      <div>Se muestran solo los cajeros de esta sucursal cuya fecha desde ya se cumpliÃ³.</div>
+      <div>Se muestran solo los cajeros de esta sucursal cuya fecha desde ya se cumplio.</div>
     </span>
   </div>
 
   <div class="row-fluid">
     <div class="span8">
       <div class="well">
-        <h5 style="margin-top:0;">Cajeros pendientes o disponibles para evaluaciÃ³n</h5>
+        <h4 style="margin-top:0;">Cajeros pendientes o disponibles para evaluacion</h4>
         <%
         If primeraColumnaEva = "RESULTADO" Then
         %>
@@ -111,7 +111,7 @@ End If
         <%
         ElseIf Not tieneEvaluaciones Then
         %>
-          <div class="alert alert-info">No hay cajeros disponibles para evaluaciÃ³n en esta sucursal.</div>
+          <div class="alert alert-info">No hay cajeros disponibles para evaluacion en esta sucursal.</div>
         <%
         Else
         %>
@@ -152,7 +152,7 @@ End If
 
     <div class="span4">
       <div class="well">
-        <h5 style="margin-top:0;">Preguntas activas</h5>
+        <h4 style="margin-top:0;">Preguntas activas</h4>
         <%
         If primeraColumnaPre = "RESULTADO" Then
         %>

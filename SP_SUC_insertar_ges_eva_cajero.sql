@@ -21,6 +21,8 @@ BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
+        DECLARE @ID_SUCURSAL INT;
+
         SET @EVA_RUT = LTRIM(RTRIM(ISNULL(@EVA_RUT, '')));
         SET @EVA_NOMBRE = LTRIM(RTRIM(ISNULL(@EVA_NOMBRE, '')));
         SET @EVA_EMP = LTRIM(RTRIM(ISNULL(@EVA_EMP, '')));
@@ -93,27 +95,27 @@ BEGIN
             RETURN;
         END;
 
+        SELECT @ID_SUCURSAL = suc.id_sucursal
+        FROM dbo.SUC_sucursal suc
+        WHERE suc.cod_bantotal = @EVA_SUC;
+
+        IF @ID_SUCURSAL IS NULL OR @ID_SUCURSAL <= 0
+        BEGIN
+            SELECT 'ERROR' AS resultado, 'La sucursal ingresada no existe en nuestra base de datos.' AS mensaje, CAST(NULL AS INT) AS id_eva;
+            RETURN;
+        END;
+
         IF EXISTS (
             SELECT 1
             FROM dbo.SUC_CAP_EVA
             WHERE EVA_RUT = @EVA_RUT
-              AND EVA_SUC = @EVA_SUC
+              AND EVA_SUC = @ID_SUCURSAL
               AND EVA_EMP = @EVA_EMP
               AND EVA_FCH_DES = @EVA_FCH_DES
               AND EVA_FCH_HAS = @EVA_FCH_HAS
         )
         BEGIN
             SELECT 'ERROR' AS resultado, 'Ya existe una evaluacion con los mismos datos para el cajero.' AS mensaje, CAST(NULL AS INT) AS id_eva;
-            RETURN;
-        END;
-
-        IF NOT EXISTS (
-            SELECT 1
-            FROM dbo.SUC_sucursal
-            WHERE cod_bantotal = @EVA_SUC
-        )
-        BEGIN
-            SELECT 'ERROR' AS resultado, 'La sucursal ingresada no existe en nuestra base de datos.' AS mensaje, CAST(NULL AS INT) AS id_eva;
             RETURN;
         END;
 
@@ -134,7 +136,7 @@ BEGIN
         (
             @EVA_RUT,
             @EVA_NOMBRE,
-            @EVA_SUC,
+            @ID_SUCURSAL,
             @EVA_EMP,
             @EVA_FCH_DES,
             @EVA_FCH_HAS,

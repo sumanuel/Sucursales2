@@ -296,14 +296,6 @@ else%>
               <i class="icon-arrow-up icon-solicitud-rebaja-cajeros-flecha"></i>
             </span>
           </span>
-        </span>        <span id="tabMenu13CajerosE" class="mano" title="Evaluación Cajeros">
-          <span class="icon-evaluacion-cajeros">
-            <i class="icon-user icon-evaluacion-cajeros-usuario"></i>
-            <span class="icon-evaluacion-cajeros-badge">
-              <i class="icon-circle icon-evaluacion-cajeros-circulo"></i>
-              <i class="icon-ok icon-evaluacion-cajeros-flecha"></i>
-            </span>
-          </span>
         </span>
         <!--<span id="botonSalirZonal" class="mano">
           <i class="icon-signout icon-2x"></i>

@@ -49,14 +49,26 @@ Function EstadoClase(valorEstado)
   End If
 End Function
 
-Dim idSucursal, sqlSucursal, rsSucursal, nombreSucursal
+Dim perfilMain, idSucursal, sqlSucursal, rsSucursal, nombreSucursal
 Dim sqlEva, rsEva, sqlPreguntas, rsPreguntas
 Dim tieneEvaluaciones, tienePreguntas, primeraColumnaEva, primeraColumnaPre
 Dim preguntasData, totalPreguntas, idxPregunta
 
+perfilMain = Trim(Request("perfilMain") & "")
 idSucursal = Trim(Request("idSucursalMain") & "")
 nombreSucursal = ""
 totalPreguntas = 0
+
+If perfilMain <> "" And perfilMain <> "1" Then
+%>
+<div class="row-fluid">
+  <span class="span12 alert alert-danger">
+    <strong><h4><i class="icon-warning-sign"></i> Este modulo solo esta disponible para el perfil JEPS.</h4></strong>
+  </span>
+</div>
+<%
+  Response.End
+End If
 
 If idSucursal = "" Or Not IsNumeric(idSucursal) Or CLng(idSucursal) <= 0 Then
 %>

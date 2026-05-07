@@ -1,7 +1,7 @@
 <style type="text/css">
   /* --- Contenedor Principal (Rebaja Cajeros) --- */
   .icon-solicitud-rebaja-cajeros {
-    position: relative; 
+    position: relative;
     display: inline-block;
     width: 28px;
     height: 28px;
@@ -19,8 +19,8 @@
   /* --- Contenedor del Badge --- */
   .icon-solicitud-rebaja-cajeros-badge {
     position: absolute;
-    right: 1px;  
-    top: -1px;    /* Mantiene el cÃƒÆ’Ã‚Â­rculo con la 'x' en la parte superior */
+    right: 1px;
+    top: -1px; /* Mantiene el cÃƒÆ’Ã‚Â­rculo con la 'x' en la parte superior */
     width: 12px;
     height: 12px;
   }
@@ -32,7 +32,7 @@
     left: 0;
     font-size: 12px;
     line-height: 12px;
-    color: inherit; 
+    color: inherit;
   }
 
   /* --- La 'X' Blanca del Badge --- */
@@ -44,7 +44,7 @@
     font-size: 7px;
     line-height: 12px;
     text-align: center;
-    color: #ffffff; 
+    color: #ffffff;
     margin: 0;
   }
 </style>
@@ -196,8 +196,8 @@
       </span>
     </span>
   </span>
-  
-    <span
+
+  <span
     id="tabMenu14"
     class="mano"
     data-placement="left"
@@ -210,11 +210,13 @@
         <i class="icon-arrow-up icon-solicitud-rebaja-cajeros-flecha"></i>
       </span>
     </span>
-  </span>  <span
+  </span>
+  <span
     id="tabMenu15"
     class="mano"
     data-placement="left"
     title="Evaluación Cajeros"
+    style="display: none"
   >
     <span class="icon-evaluacion-cajeros">
       <i class="icon-user icon-evaluacion-cajeros-usuario"></i>
@@ -225,7 +227,6 @@
     </span>
   </span>
 
-  
   <!--
 	<span id="tabMenu9" class="mano" data-placement="left" title="Salir">
 		<i class="icon-signout icon-2x mano" ></i>
@@ -311,12 +312,15 @@
       enviaDatos(pagina, div, datos);
     } catch (err) {}
   });
-  $("#tabMenu15").click(function () {
-    pagina = "sucursales/evaluacionCajeros.asp";
-    div = "area";
-    datos = "";
-    try {
-      enviaDatos(pagina, div, datos);
-    } catch (err) {}
-  });
+  if ($("#perfilMain").val() === "1") {
+    $("#tabMenu15").show();
+    $("#tabMenu15").click(function () {
+      pagina = "sucursales/evaluacionCajeros.asp";
+      div = "area";
+      datos = "";
+      try {
+        enviaDatos(pagina, div, datos);
+      } catch (err) {}
+    });
+  }
 </script>

@@ -6,7 +6,7 @@
     width: 28px;
     height: 28px;
     vertical-align: middle;
-    top: -4px; /* <-- LÍNEA DESCOMENTADA: Esto lo sube a la misma altura que los demás */
+    top: -4px; /* <-- LÃƒÆ’Ã‚ÂNEA DESCOMENTADA: Esto lo sube a la misma altura que los demÃƒÆ’Ã‚Â¡s */
   }
 
   /* --- Icono del Usuario Principal --- */
@@ -20,12 +20,12 @@
   .icon-solicitud-rebaja-cajeros-badge {
     position: absolute;
     right: 1px;  
-    top: -1px;    /* Mantiene el círculo con la 'x' en la parte superior */
+    top: -1px;    /* Mantiene el cÃƒÆ’Ã‚Â­rculo con la 'x' en la parte superior */
     width: 12px;
     height: 12px;
   }
 
-  /* --- El Círculo Negro del Badge --- */
+  /* --- El CÃƒÆ’Ã‚Â­rculo Negro del Badge --- */
   .icon-solicitud-rebaja-cajeros-circulo {
     position: absolute;
     top: 0;
@@ -55,7 +55,7 @@
     width: 28px;
     height: 28px;
     vertical-align: middle;
-    top: -4px; /* <-- LÍNEA DESCOMENTADA: Esto lo sube a la misma altura que los demás */
+    top: -4px; /* <-- LÃƒÆ’Ã‚ÂNEA DESCOMENTADA: Esto lo sube a la misma altura que los demÃƒÆ’Ã‚Â¡s */
   }
 
   .icon-solicitud-cajeros-usuario {
@@ -82,6 +82,51 @@
   }
 
   .icon-solicitud-cajeros-flecha {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    font-size: 7px;
+    line-height: 12px;
+    text-align: center;
+    color: #ffffff;
+    margin: 0;
+  }
+</style>
+<style type="text/css">
+  .icon-evaluacion-cajeros {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    vertical-align: middle;
+    top: -4px;
+  }
+
+  .icon-evaluacion-cajeros-usuario {
+    font-size: 24px;
+    line-height: 28px;
+    color: inherit;
+  }
+
+  .icon-evaluacion-cajeros-badge {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .icon-evaluacion-cajeros-circulo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 12px;
+    line-height: 12px;
+    color: #5cb85c;
+  }
+
+  .icon-evaluacion-cajeros-flecha {
     position: absolute;
     top: 0;
     left: 0;
@@ -165,7 +210,21 @@
         <i class="icon-arrow-up icon-solicitud-rebaja-cajeros-flecha"></i>
       </span>
     </span>
+  </span>  <span
+    id="tabMenu15"
+    class="mano"
+    data-placement="left"
+    title="Evaluación Cajeros"
+  >
+    <span class="icon-evaluacion-cajeros">
+      <i class="icon-user icon-evaluacion-cajeros-usuario"></i>
+      <span class="icon-evaluacion-cajeros-badge">
+        <i class="icon-circle icon-evaluacion-cajeros-circulo"></i>
+        <i class="icon-ok icon-evaluacion-cajeros-flecha"></i>
+      </span>
+    </span>
   </span>
+
   
   <!--
 	<span id="tabMenu9" class="mano" data-placement="left" title="Salir">
@@ -246,6 +305,14 @@
   });
   $("#tabMenu14").click(function () {
     pagina = "sucursales/solicitudRebajaCajerosAdicionales.asp";
+    div = "area";
+    datos = "";
+    try {
+      enviaDatos(pagina, div, datos);
+    } catch (err) {}
+  });
+  $("#tabMenu15").click(function () {
+    pagina = "sucursales/evaluacionCajeros.asp";
     div = "area";
     datos = "";
     try {

@@ -67,7 +67,7 @@ else%>
     width: 28px;
     height: 28px;
     vertical-align: text-top;
-    top: -11px; /* <-- LÍNEA DESCOMENTADA: Esto lo sube a la misma altura que los demás */
+    top: -11px; /* <-- LÃƒÆ’Ã‚ÂNEA DESCOMENTADA: Esto lo sube a la misma altura que los demÃƒÆ’Ã‚Â¡s */
   }
 
   /* --- Icono del Usuario Principal --- */
@@ -81,12 +81,12 @@ else%>
   .icon-solicitud-rebaja-cajeros-badge {
     position: absolute;
     right: 1px;  
-    top: -1px;    /* Mantiene el círculo con la 'x' en la parte superior */
+    top: -1px;    /* Mantiene el cÃƒÆ’Ã‚Â­rculo con la 'x' en la parte superior */
     width: 12px;
     height: 12px;
   }
 
-  /* --- El Círculo Negro del Badge --- */
+  /* --- El CÃƒÆ’Ã‚Â­rculo Negro del Badge --- */
   .icon-solicitud-rebaja-cajeros-circulo {
     position: absolute;
     top: 0;
@@ -144,6 +144,52 @@ else%>
   }
 
   .icon-solicitud-cajeros-flecha {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    font-size: 7px;
+    line-height: 12px;
+    text-align: center;
+    color: #ffffff;
+    margin: 0;
+  }
+</style>
+
+  <style type="text/css">
+  .icon-evaluacion-cajeros {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    vertical-align: text-top;
+    top: -11px;
+  }
+
+  .icon-evaluacion-cajeros-usuario {
+    font-size: 24px;
+    line-height: 28px;
+    color: inherit;
+  }
+
+  .icon-evaluacion-cajeros-badge {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .icon-evaluacion-cajeros-circulo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 12px;
+    line-height: 12px;
+    color: #5cb85c;
+  }
+
+  .icon-evaluacion-cajeros-flecha {
     position: absolute;
     top: 0;
     left: 0;
@@ -223,7 +269,7 @@ else%>
         <span id="muestraGraficoZonal" class="muestraGraficoZonal mano" data-placement="top" data-original-title="Tendencias">
           <i class="icon-bar-chart icon-2x mano ayuda" ></i>
         </span>
-        <!--Jes�s-->
+        <!--JesÃƒÂ¯Ã‚Â¿Ã‚Â½s-->
         <span id="tabMenu13CajerosA" class="mano" title="Solicitudes de Cajeros Adicionales">
           <!--span class="icon-stack icon-2x">
             <i class="icon-check-empty icon-stack-base"></i>
@@ -248,6 +294,14 @@ else%>
             <span class="icon-solicitud-rebaja-cajeros-badge">
               <i class="icon-circle icon-solicitud-rebaja-cajeros-circulo"></i>
               <i class="icon-arrow-up icon-solicitud-rebaja-cajeros-flecha"></i>
+            </span>
+          </span>
+        </span>        <span id="tabMenu13CajerosE" class="mano" title="Evaluación Cajeros">
+          <span class="icon-evaluacion-cajeros">
+            <i class="icon-user icon-evaluacion-cajeros-usuario"></i>
+            <span class="icon-evaluacion-cajeros-badge">
+              <i class="icon-circle icon-evaluacion-cajeros-circulo"></i>
+              <i class="icon-ok icon-evaluacion-cajeros-flecha"></i>
             </span>
           </span>
         </span>

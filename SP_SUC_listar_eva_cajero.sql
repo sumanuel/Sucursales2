@@ -1,41 +1,24 @@
-IF OBJECT_ID('dbo.SP_SUC_listar_ges_eva_cajero', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.SP_SUC_listar_ges_eva_cajero;
-GO
-
 IF OBJECT_ID('dbo.SP_SUC_listar_eva_cajero', 'P') IS NOT NULL
     DROP PROCEDURE dbo.SP_SUC_listar_eva_cajero;
 GO
 
-CREATE PROCEDURE [dbo].[SP_SUC_listar_ges_eva_cajero]
+CREATE PROCEDURE [dbo].[SP_SUC_listar_eva_cajero]
     @ID_EVA        INT = NULL,
     @EVA_EST       SMALLINT = NULL,
     @EVA_SUC       INT = NULL,
+    @ID_SUCURSAL   INT = NULL,
     @EVA_RUT       VARCHAR(10) = NULL,
     @TOP_REGISTROS INT = 100,
-    @FCH_DESDE     DATE = NULL,
-    @FCH_HASTA     DATE = NULL
+    @VALIDAR_FECHA_DESDE BIT = 0
 AS
 BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
-        DECLARE @INICIO_MES_ACTUAL DATE;
-        DECLARE @FIN_MES_ACTUAL DATE;
-        DECLARE @FECHA_AUX DATE;
-
         SET @EVA_RUT = LTRIM(RTRIM(ISNULL(@EVA_RUT, '')));
-        SET @INICIO_MES_ACTUAL = DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1);
-        SET @FIN_MES_ACTUAL = EOMONTH(GETDATE());
 
         IF @TOP_REGISTROS IS NULL OR @TOP_REGISTROS <= 0
             SET @TOP_REGISTROS = 100;
-
-        IF @FCH_DESDE IS NOT NULL AND @FCH_HASTA IS NOT NULL AND @FCH_DESDE > @FCH_HASTA
-        BEGIN
-            SET @FECHA_AUX = @FCH_DESDE;
-            SET @FCH_DESDE = @FCH_HASTA;
-            SET @FCH_HASTA = @FECHA_AUX;
-        END
 
         SELECT TOP (@TOP_REGISTROS)
             ID_EVA,
@@ -55,25 +38,13 @@ BEGIN
             EVA_USR,
             EVA_FCH
         FROM dbo.SUC_CAP_EVA eva
-		INNER JOIN dbo.SUC_sucursal suc ON eva.EVA_SUC = suc.cod_bantotal
+        INNER JOIN dbo.SUC_sucursal suc ON eva.EVA_SUC = suc.cod_bantotal
         WHERE (@ID_EVA IS NULL OR ID_EVA = @ID_EVA)
           AND (@EVA_EST IS NULL OR EVA_EST = @EVA_EST)
           AND (@EVA_SUC IS NULL OR EVA_SUC = @EVA_SUC)
+          AND (@ID_SUCURSAL IS NULL OR suc.id_sucursal = @ID_SUCURSAL)
           AND (@EVA_RUT = '' OR EVA_RUT = @EVA_RUT)
-          AND (
-              @ID_EVA IS NOT NULL
-              OR (
-                  @FCH_DESDE IS NULL
-                  AND @FCH_HASTA IS NULL
-                  AND EVA_FCH_DES <= @FIN_MES_ACTUAL
-                  AND EVA_FCH_HAS >= @INICIO_MES_ACTUAL
-              )
-              OR (
-                  (@FCH_DESDE IS NOT NULL OR @FCH_HASTA IS NOT NULL)
-                  AND EVA_FCH_DES <= ISNULL(@FCH_HASTA, CONVERT(DATE, '99991231'))
-                  AND EVA_FCH_HAS >= ISNULL(@FCH_DESDE, CONVERT(DATE, '19000101'))
-              )
-          )
+          AND (@VALIDAR_FECHA_DESDE = 0 OR eva.EVA_FCH_DES <= CONVERT(DATE, GETDATE()))
         ORDER BY ID_EVA DESC;
     END TRY
     BEGIN CATCH

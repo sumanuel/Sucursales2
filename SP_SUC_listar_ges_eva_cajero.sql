@@ -2,10 +2,6 @@ IF OBJECT_ID('dbo.SP_SUC_listar_ges_eva_cajero', 'P') IS NOT NULL
     DROP PROCEDURE dbo.SP_SUC_listar_ges_eva_cajero;
 GO
 
-IF OBJECT_ID('dbo.SP_SUC_listar_eva_cajero', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.SP_SUC_listar_eva_cajero;
-GO
-
 CREATE PROCEDURE [dbo].[SP_SUC_listar_ges_eva_cajero]
     @ID_EVA        INT = NULL,
     @EVA_EST       SMALLINT = NULL,

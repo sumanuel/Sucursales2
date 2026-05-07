@@ -108,7 +108,7 @@ For Each itemRespuesta In arrRespuestas
     End If
 
     preId = Trim(partesRespuesta(0) & "")
-    valorRespuesta = UCase(Trim(partesRespuesta(1) & ""))
+    valorRespuesta = Trim(partesRespuesta(1) & "")
 
     If Not IsNumeric(preId) Then
       Responder "ERROR", "El item evaluado es invalido."
@@ -116,7 +116,11 @@ For Each itemRespuesta In arrRespuestas
     If Not preguntasDict.Exists(preId) Then
       Responder "ERROR", "Se recibio un item que no esta habilitado para evaluar."
     End If
-    If valorRespuesta <> "SI" And valorRespuesta <> "NO" And valorRespuesta <> "NA" Then
+    If Not IsNumeric(valorRespuesta) Then
+      Responder "ERROR", "La respuesta de uno de los items no es valida."
+    End If
+    valorRespuesta = CLng(valorRespuesta)
+    If valorRespuesta <> 0 And valorRespuesta <> 1 And valorRespuesta <> 2 Then
       Responder "ERROR", "La respuesta de uno de los items no es valida."
     End If
     If respuestasDict.Exists(preId) Then
@@ -170,7 +174,7 @@ If rsTmp.State = 1 Then rsTmp.Close
 Set rsTmp = Nothing
 
 For Each key In respuestasDict.Keys
-  sql = "INSERT INTO dbo.SUC_CAP_RES (PRE_ID_PRE, ID_EVA, RES_RES) VALUES (" & CLng(key) & ", " & idEva & ", '" & SqlTexto(respuestasDict(key)) & "')"
+  sql = "INSERT INTO dbo.SUC_CAP_RES (PRE_ID_PRE, ID_EVA, RES_RES) VALUES (" & CLng(key) & ", " & idEva & ", " & CLng(respuestasDict(key)) & ")"
   Err.Clear
   DB.Execute sql, recordsAffected
   If Err.Number <> 0 Then

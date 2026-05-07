@@ -237,9 +237,9 @@ End If
           <td style="text-align:center;">
             <select class="span12 respuesta-evaluacion" data-pre-id="<%=TextoSeguro(preguntasData(0, idxPregunta))%>">
               <option value="">[Seleccione]</option>
-              <option value="SI">Si</option>
-              <option value="NO">No</option>
-              <option value="NA">N/A</option>
+              <option value="1">Si</option>
+              <option value="0">No</option>
+              <option value="2">N/A</option>
             </select>
           </td>
         </tr>
@@ -297,10 +297,10 @@ End If
 
     $("#tablaFormularioEvaluacion .respuesta-evaluacion").each(function () {
       var valor = $.trim($(this).val() || "");
-      if (valor === "SI" || valor === "NO") {
+      if (valor === "1" || valor === "0") {
         totalConsiderados += 1;
       }
-      if (valor === "SI") {
+      if (valor === "1") {
         totalSi += 1;
       }
     });

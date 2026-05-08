@@ -336,6 +336,13 @@ if not rs.eof then
                             </a>
                         </span>
                         &nbsp;&nbsp;
+                        <span class="btnMaestroReportes" id="btnMaestroReportes">
+                            <a class="btn btn-inverse" href="#" style="background-color: #355c7d; border-color: #355c7d; background-image: none;">
+                                <i class="icon-table icon-large"></i>
+                                &nbsp;<span class="bajaLetra"><b>MAESTRO Y REPORTES</b></span>
+                            </a>
+                        </span>
+                        &nbsp;&nbsp;
                         <span class="">
                             <a class="btn btn-warning oculto btnVolverAdmini5" href="#">
                                 <i class="icon-arrow-left icon-large"></i>
@@ -345,6 +352,13 @@ if not rs.eof then
                         &nbsp;&nbsp;
                         <span class="">
                             <a class="btn btn-warning oculto btnVolverAdmini6" href="#">
+                                <i class="icon-arrow-left icon-large"></i>
+                                &nbsp;<span class="bajaLetra"><b>VOLVER AL INICIO</b></span>
+                            </a>
+                        </span>
+                        &nbsp;&nbsp;
+                        <span class="">
+                            <a class="btn btn-warning oculto btnVolverAdmini7" href="#">
                                 <i class="icon-arrow-left icon-large"></i>
                                 &nbsp;<span class="bajaLetra"><b>VOLVER AL INICIO</b></span>
                             </a>
@@ -382,6 +396,11 @@ if not rs.eof then
                 <div class="row-fluid dvTbEvaluacionCajeros oculto" id="dvTbEvaluacionCajeros">
                     <div class="span1">&nbsp;</div>
                     <div class="span10" id="tbEvaluacionCajeros"></div>
+                </div>
+                <br/>
+                <div class="row-fluid dvTbMaestroReportes oculto" id="dvTbMaestroReportes">
+                    <div class="span1">&nbsp;</div>
+                    <div class="span10" id="tbMaestroReportes"></div>
                 </div>
 
             </div>
@@ -883,6 +902,7 @@ $('.btnGestionCasos').click(function(){
     $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
     $('.btnEvaluacionCajeros').addClass('oculto');
+    $('.btnMaestroReportes').addClass('oculto');
     $('.btnGestionCasosDetalle').removeClass('oculto');
     $('.btnGestionCasosDetalles').removeClass('btn btn-danger').addClass('btn btn-primary');
 });
@@ -982,6 +1002,7 @@ $('.btnCuadroDeControl').click(function(){
     $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
     $('.btnEvaluacionCajeros').addClass('oculto');
+    $('.btnMaestroReportes').addClass('oculto');
     $('.btnControlOnline').removeClass('oculto');
     $('.dvTbCuadroDeControl').removeClass('oculto');
     $('.btnVolverAdmini').removeClass('oculto');
@@ -1013,6 +1034,7 @@ $('.btnCuadroDeControl2').click(function(){
     $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
     $('.btnEvaluacionCajeros').addClass('oculto');
+    $('.btnMaestroReportes').addClass('oculto');
     $('.dvTbCuadroDeControl').removeClass('oculto');
     $('.btnVolverAdmini2').removeClass('oculto');
     $('.btnCuadroControlAdMes').removeClass('oculto');
@@ -1045,6 +1067,7 @@ $('.btnGestionProveedores').click(function(){
     $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
     $('.btnEvaluacionCajeros').addClass('oculto');
+    $('.btnMaestroReportes').addClass('oculto');
     $('.dvTbGestionProveedores').removeClass('oculto');
     $('.btnVolverAdmini4').removeClass('oculto');
     $('#Central_Columna_mensual').addClass('oculto');
@@ -1072,6 +1095,7 @@ $('.btnSolicitudCajerosAdicionales').click(function(){
     $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
     $('.btnEvaluacionCajeros').addClass('oculto');
+    $('.btnMaestroReportes').addClass('oculto');
     $('.dvTbSolicitudCajerosAdicionales').removeClass('oculto');
     $('.btnVolverAdmini5').removeClass('oculto');
     $('#Central_Columna_mensual').addClass('oculto');
@@ -1100,6 +1124,7 @@ $('.btnSolicitudRebajaCajerosAdicionales').click(function(){
     $('#Central_Columna_mensual').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
     $('.btnEvaluacionCajeros').addClass('oculto');
+    $('.btnMaestroReportes').addClass('oculto');
     $('#tbSolicitudCajerosAdicionales').html('');
     var div = 'tbSolicitudCajerosAdicionales';
     var datos = '';
@@ -1122,6 +1147,7 @@ $('.btnPreguntasCapacitacionCajeros').click(function(){
     $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
     $('.btnEvaluacionCajeros').addClass('oculto');
+    $('.btnMaestroReportes').addClass('oculto');
     $('.dvTbSolicitudCajerosAdicionales').removeClass('oculto');
     $('.btnVolverAdmini5').removeClass('oculto');
     $('#Central_Columna_mensual').addClass('oculto');
@@ -1151,6 +1177,7 @@ $('.btnEvaluacionCajeros').click(function(){
     $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
     $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
     $('.btnEvaluacionCajeros').addClass('oculto');
+    $('.btnMaestroReportes').addClass('oculto');
     $('.dvTbEvaluacionCajeros').removeClass('oculto');
     $('.btnVolverAdmini6').removeClass('oculto');
     $('#Central_Columna_mensual').addClass('oculto');
@@ -1163,11 +1190,37 @@ $('.btnEvaluacionCajeros').click(function(){
     enviaDatos(pagina, div, datos);
 });
 
+$('.btnMaestroReportes').click(function(){
+    $('.btnGestionCasos').addClass('oculto');
+    $('.btnCuadroDeControl').addClass('oculto');
+    $('.btnCuadroDeControl2').addClass('oculto');
+    $('.btnGestionProveedores').addClass('oculto');
+    $('.btnSolicitudCajerosAdicionales').addClass('oculto');
+    $('.btnSolicitudRebajaCajerosAdicionales').addClass('oculto');
+    $('.btnPreguntasCapacitacionCajeros').addClass('oculto');
+    $('.btnEvaluacionCajeros').addClass('oculto');
+    $('.btnMaestroReportes').addClass('oculto');
+    $('.dvTbMaestroReportes').removeClass('oculto');
+    $('.btnVolverAdmini7').removeClass('oculto');
+    $('#Central_Columna_mensual').addClass('oculto');
+
+    $('#tbMaestroReportes').html('');
+    var div = 'tbMaestroReportes';
+    var datos = '';
+    var pagina = 'maestro_reportes.asp';
+
+    enviaDatos(pagina, div, datos);
+});
+
 $('.btnVolverAdmini5').click(function(){
     location.reload();
 });
 
 $('.btnVolverAdmini6').click(function(){
+    location.reload();
+});
+
+$('.btnVolverAdmini7').click(function(){
     location.reload();
 });
 

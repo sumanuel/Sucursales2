@@ -68,7 +68,7 @@ End If
 
 If rsDatos.EOF Then
   Response.Write "<div class=""alert alert-info""><strong>Filtro aplicado:</strong> Desde " & MrTextoSeguro(MrFechaDMY(filtroDesde)) & " | Hasta " & MrTextoSeguro(MrFechaDMY(filtroHasta)) & "</div>"
-  Response.Write "<table class=""table table-bordered table-hover""><thead><tr style=""background-color:#f5f5f5""><th>Rut cajero</th><th>Nombre cajero</th><th>Proveedor</th><th>Fecha Envio Capacitacion</th><th>Fecha Evaluacion</th><th>Estado</th><th>Puntaje Evaluacion</th><th>Comentario</th><th style=""width:60px;text-align:center;"">Accion</th></tr></thead><tbody><tr><td colspan=""9"" style=""text-align:center;"">No hay cajeros cargados para el rango seleccionado.</td></tr></tbody></table>"
+  Response.Write "<table class=""table table-bordered table-hover""><thead><tr style=""background-color:#f5f5f5""><th>Rut cajero</th><th>Nombre cajero</th><th>Proveedor</th><th>Fecha Envio Capacitacion</th><th>Fecha Evaluacion</th><th>Estado</th><th>Puntaje Evaluacion</th><th>Comentario JEPS</th><th>Comentario areas centrales</th><th style=""width:95px;text-align:center;"">Accion</th></tr></thead><tbody><tr><td colspan=""10"" style=""text-align:center;"">No hay cajeros cargados para el rango seleccionado.</td></tr></tbody></table>"
   Response.End
 End If
 
@@ -100,7 +100,7 @@ Response.Write ".estado-maestro-default{background-color:#999;}"
 Response.Write ".paginacion-maestro-reportes{text-align:center;margin-top:15px;}"
 Response.Write "</style>"
 Response.Write "<div class=""alert alert-info"" style=""margin-bottom:12px""><strong>Filtro aplicado:</strong> Desde " & MrTextoSeguro(MrFechaDMY(filtroDesde)) & " | Hasta " & MrTextoSeguro(MrFechaDMY(filtroHasta)) & "</div>"
-Response.Write "<table class=""table table-bordered table-hover table-striped""><thead><tr style=""background-color:#f5f5f5""><th>Rut cajero</th><th>Nombre cajero</th><th>Proveedor</th><th>Fecha Envio Capacitacion</th><th>Fecha Evaluacion</th><th>Estado</th><th>Puntaje Evaluacion</th><th>Comentario</th><th style=""width:60px;text-align:center;"">Accion</th></tr></thead><tbody>"
+Response.Write "<table class=""table table-bordered table-hover table-striped""><thead><tr style=""background-color:#f5f5f5""><th>Rut cajero</th><th>Nombre cajero</th><th>Proveedor</th><th>Fecha Envio Capacitacion</th><th>Fecha Evaluacion</th><th>Estado</th><th>Puntaje Evaluacion</th><th>Comentario JEPS</th><th>Comentario areas centrales</th><th style=""width:95px;text-align:center;"">Accion</th></tr></thead><tbody>"
 
 For i = inicioIndice To finIndice
   Response.Write "<tr>"
@@ -112,8 +112,10 @@ For i = inicioIndice To finIndice
   Response.Write "<td><span class=""estado-maestro " & MrEstadoClase(datos(10, i)) & """>" & MrTextoSeguro(datos(10, i)) & "</span></td>"
   Response.Write "<td>" & MrTextoSeguro(datos(11, i)) & "</td>"
   Response.Write "<td>" & MrTextoSeguro(datos(7, i)) & "</td>"
+  Response.Write "<td>" & MrTextoSeguro(datos(8, i)) & "</td>"
   Response.Write "<td style=""text-align:center;white-space:nowrap;"">"
   If CLng(datos(9, i)) > 1 Then
+    Response.Write "<a href=""#"" class=""btnVerDetalleEvaluacion"" data-id=""" & MrTextoSeguro(datos(0, i)) & """ title=""Ver preguntas y respuestas"" style=""margin-right:8px;""><i class=""icon-eye-open icon-large""></i></a>"
     Response.Write "<a href=""#"" class=""btnEditarResultadoCentral"" data-id=""" & MrTextoSeguro(datos(0, i)) & """ title=""Editar resultado areas centrales""><i class=""icon-edit icon-large""></i></a>"
   Else
     Response.Write "<span style=""color:#999;"">-</span>"

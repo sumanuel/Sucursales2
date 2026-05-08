@@ -66,6 +66,10 @@ BEGIN
             WHERE res.ID_EVA = eva.ID_EVA
         ) puntaje
         WHERE (@ID_EVA IS NULL OR eva.ID_EVA = @ID_EVA)
+            AND (
+                @ID_EVA IS NOT NULL
+                OR eva.EVA_EST IN (2, 3)
+              )
           AND (
                 @ID_EVA IS NOT NULL
                 OR (

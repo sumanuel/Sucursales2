@@ -16,36 +16,36 @@ CLng(valor) = 1 Then RespuestaTexto = "Si" ElseIf CLng(valor) = 0 Then
 RespuestaTexto = "No" ElseIf CLng(valor) = 2 Then RespuestaTexto = "N/A" Else
 RespuestaTexto = CStr(valor) End If End Function Dim filtroDesde, filtroHasta
 Dim rsPreguntas, rsDatos, rsRespuestas Dim sqlPreguntas, sqlDatos, sqlRespuestas
-Dim preguntas, datos, respuestas Dim totalPreguntas, totalDatos, i, j Dim
-idsEva, llave, dicRespuestas filtroDesde = FechaSqlMr(Request("fch_desde"))
-filtroHasta = FechaSqlMr(Request("fch_hasta")) If filtroDesde = "" Then
-filtroDesde = FechaSqlMr(DateAdd("m", -3, Date())) If filtroHasta = "" Then
-filtroHasta = FechaSqlMr(Date()) sqlPreguntas = "SELECT PRE_ID_PRE, PRE_TIT,
-PRE_ORD FROM dbo.SUC_CAP_PRE WHERE ISNULL(PRE_EST, 0) = 1 ORDER BY PRE_ORD,
-PRE_ID_PRE" Set rsPreguntas = db.Execute(sqlPreguntas) If Not rsPreguntas.EOF
-Then preguntas = rsPreguntas.GetRows() If rsPreguntas.State = 1 Then
-rsPreguntas.Close Set rsPreguntas = Nothing sqlDatos = "EXEC
-dbo.SP_SUC_listar_mae_rep_eva_cajero @TOP_REGISTROS = 5000, @FCH_DESDE = '" &
-filtroDesde & "', @FCH_HASTA = '" & filtroHasta & "'" Set rsDatos =
-db.Execute(sqlDatos) If rsDatos.EOF Then Response.Write CsvSafe("Rut cajero") &
-"," & CsvSafe("Nombre cajero") & vbCrLf Response.End End If If
-UCase(Trim(rsDatos.Fields(0).Name & "")) = "RESULTADO" Then Response.Write
-CsvSafe("Error") & "," & CsvSafe(rsDatos("mensaje")) & vbCrLf Response.End End
-If datos = rsDatos.GetRows() If rsDatos.State = 1 Then rsDatos.Close Set rsDatos
-= Nothing totalDatos = UBound(datos, 2) idsEva = "" For i = 0 To totalDatos If
-idsEva <> "" Then idsEva = idsEva & "," idsEva = idsEva & CLng(datos(0, i)) Next
-Set dicRespuestas = Server.CreateObject("Scripting.Dictionary") If idsEva <> ""
-Then sqlRespuestas = "SELECT ID_EVA, PRE_ID_PRE, RES_RES FROM dbo.SUC_CAP_RES
-WHERE ID_EVA IN (" & idsEva & ")" Set rsRespuestas = db.Execute(sqlRespuestas)
-If Not rsRespuestas.EOF Then respuestas = rsRespuestas.GetRows() For i = 0 To
+Dim preguntas, datos, respuestas Dim totalDatos, i, j Dim idsEva, llave,
+dicRespuestas filtroDesde = FechaSqlMr(Request("fch_desde")) filtroHasta =
+FechaSqlMr(Request("fch_hasta")) If filtroDesde = "" Then filtroDesde =
+FechaSqlMr(DateAdd("m", -3, Date())) If filtroHasta = "" Then filtroHasta =
+FechaSqlMr(Date()) sqlPreguntas = "SELECT PRE_ID_PRE, PRE_TIT, PRE_ORD FROM
+dbo.SUC_CAP_PRE WHERE ISNULL(PRE_EST, 0) = 1 ORDER BY PRE_ORD, PRE_ID_PRE" Set
+rsPreguntas = db.Execute(sqlPreguntas) If Not rsPreguntas.EOF Then preguntas =
+rsPreguntas.GetRows() If rsPreguntas.State = 1 Then rsPreguntas.Close Set
+rsPreguntas = Nothing sqlDatos = "EXEC dbo.SP_SUC_listar_mae_rep_eva_cajero
+@TOP_REGISTROS = 5000, @FCH_DESDE = '" & filtroDesde & "', @FCH_HASTA = '" &
+filtroHasta & "'" Set rsDatos = db.Execute(sqlDatos) If rsDatos.EOF Then
+Response.Write CsvSafe("Rut cajero") & "," & CsvSafe("Nombre cajero") & vbCrLf
+Response.End End If If UCase(Trim(rsDatos.Fields(0).Name & "")) = "RESULTADO"
+Then Response.Write CsvSafe("Error") & "," & CsvSafe(rsDatos("mensaje")) &
+vbCrLf Response.End End If datos = rsDatos.GetRows() If rsDatos.State = 1 Then
+rsDatos.Close Set rsDatos = Nothing totalDatos = UBound(datos, 2) idsEva = ""
+For i = 0 To totalDatos If idsEva <> "" Then idsEva = idsEva & "," idsEva =
+idsEva & CLng(datos(0, i)) Next Set dicRespuestas =
+Server.CreateObject("Scripting.Dictionary") If idsEva <> "" Then sqlRespuestas =
+"SELECT ID_EVA, PRE_ID_PRE, RES_RES FROM dbo.SUC_CAP_RES WHERE ID_EVA IN (" &
+idsEva & ")" Set rsRespuestas = db.Execute(sqlRespuestas) If Not
+rsRespuestas.EOF Then respuestas = rsRespuestas.GetRows() For i = 0 To
 UBound(respuestas, 2) llave = CStr(respuestas(0, i)) & "_" & CStr(respuestas(1,
 i)) dicRespuestas(llave) = RespuestaTexto(respuestas(2, i)) Next End If If
 rsRespuestas.State = 1 Then rsRespuestas.Close Set rsRespuestas = Nothing End If
 Response.Write CsvSafe("Rut cajero") & "," & CsvSafe("Nombre cajero") & "," &
 CsvSafe("Proveedor") & "," & CsvSafe("Fecha Envio Capacitacion") & "," &
 CsvSafe("Fecha Evaluacion") & "," & CsvSafe("Estado") & "," & CsvSafe("Puntaje
-Evaluacion") & "," & CsvSafe("Comentario") & "," & CsvSafe("Resultado areas
-centrales") If IsArray(preguntas) Then For j = 0 To UBound(preguntas, 2)
+Evaluacion") & "," & CsvSafe("Comentario JEPS") & "," & CsvSafe("Comentario
+areas centrales") If IsArray(preguntas) Then For j = 0 To UBound(preguntas, 2)
 Response.Write "," & CsvSafe("Pregunta " & (j + 1) & " - " & preguntas(1, j))
 Next End If Response.Write vbCrLf For i = 0 To totalDatos Response.Write
 CsvSafe(datos(1, i)) & "," & CsvSafe(datos(2, i)) & "," & CsvSafe(datos(3, i)) &

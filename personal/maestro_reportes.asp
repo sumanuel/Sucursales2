@@ -150,6 +150,28 @@
   </div>
 </div>
 
+<div
+  id="modalVerDetalleEvaluacion"
+  class="modal hide fade"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+  style="width: 900px; margin-left: -450px"
+>
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+      &times;
+    </button>
+    <h3>Preguntas y respuestas de la evaluacion</h3>
+  </div>
+  <div class="modal-body" id="mrContenedorDetalleEvaluacion">
+    <div class="alert alert-info">Consultando detalle...</div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+  </div>
+</div>
+
 <script type="text/javascript">
   function mrEscaparHtml(texto) {
     return $("<div/>")
@@ -289,6 +311,23 @@
     });
   }
 
+  function mrAbrirDetalleEvaluacion(idEva) {
+    $("#mrContenedorDetalleEvaluacion").html(
+      '<div class="alert alert-info">Consultando detalle...</div>',
+    );
+    $("#modalVerDetalleEvaluacion").modal("show");
+    $("#mrContenedorDetalleEvaluacion").load(
+      "maestro_reportes_ver_detalle.asp?id=" + encodeURIComponent(idEva),
+      function (respuesta, estado) {
+        if (estado !== "success") {
+          $("#mrContenedorDetalleEvaluacion").html(
+            '<div class="alert alert-error">No fue posible cargar el detalle de la evaluacion.</div>',
+          );
+        }
+      },
+    );
+  }
+
   $(document)
     .off("click", "#btnFiltrarMaestroReportes")
     .on("click", "#btnFiltrarMaestroReportes", function () {
@@ -320,6 +359,13 @@
       e.preventDefault();
       mrLimpiarResultado();
       mrAbrirModal($(this).data("id"));
+    });
+
+  $(document)
+    .off("click", ".btnVerDetalleEvaluacion")
+    .on("click", ".btnVerDetalleEvaluacion", function (e) {
+      e.preventDefault();
+      mrAbrirDetalleEvaluacion($(this).data("id"));
     });
 
   $(document)

@@ -68,7 +68,9 @@
       <div class="well">
         <div class="row-fluid" style="margin-bottom: 12px">
           <div class="span12">
-            <h4 style="margin-top: 0; margin-bottom: 10px">Evaluaciones cargadas</h4>
+            <h4 style="margin-top: 0; margin-bottom: 10px">
+              Evaluaciones cargadas
+            </h4>
           </div>
         </div>
         <div class="row-fluid" style="margin-bottom: 15px">
@@ -81,10 +83,18 @@
             <input type="date" id="filtro_eva_hasta" class="span12" />
           </div>
           <div class="span6" style="padding-top: 23px; text-align: right">
-            <button type="button" class="btn btn-primary" id="btnFiltrarEvaluacionCajeros">
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="btnFiltrarEvaluacionCajeros"
+            >
               <i class="icon-search icon-white"></i> Filtrar
             </button>
-            <button type="button" class="btn" id="btnMesActualEvaluacionCajeros">
+            <button
+              type="button"
+              class="btn"
+              id="btnMesActualEvaluacionCajeros"
+            >
               Mes actual
             </button>
           </div>
@@ -196,10 +206,14 @@
   function establecerFiltroMesActualEvaluacion() {
     var hoy = new Date();
     $("#filtro_eva_desde").val(
-      formatearFechaInputEvaluacion(new Date(hoy.getFullYear(), hoy.getMonth(), 1)),
+      formatearFechaInputEvaluacion(
+        new Date(hoy.getFullYear(), hoy.getMonth(), 1),
+      ),
     );
     $("#filtro_eva_hasta").val(
-      formatearFechaInputEvaluacion(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0)),
+      formatearFechaInputEvaluacion(
+        new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0),
+      ),
     );
   }
 
@@ -260,6 +274,10 @@
     html += cuerpoHtml;
     html += "</div>";
     $("#resultadoCargaEvaluacionCajeros").html(html);
+  }
+
+  function limpiarResultadoCargaEvaluacion() {
+    $("#resultadoCargaEvaluacionCajeros").html("");
   }
 
   function onEvaluacionCajerosUploadCompleto(resultado) {
@@ -323,7 +341,9 @@
     var i = 0;
 
     html +=
-      "<p><strong>Insertados:</strong> " +
+      "<p><strong>Intentados:</strong> " +
+      (resultado.intentados || 0) +
+      " | <strong>Insertados:</strong> " +
       resultado.insertados +
       " | <strong>Errores:</strong> " +
       resultado.errores +
@@ -342,8 +362,15 @@
     if (resultado.mensajes && resultado.mensajes.length > 0) {
       html += '<ol style="margin-bottom:0;">';
       for (i = 0; i < resultado.mensajes.length; i++) {
-        html +=
-          "<li>" + escaparHtmlEvaluacion(resultado.mensajes[i].texto) + "</li>";
+        if (
+          resultado.mensajes[i].texto &&
+          $.trim(resultado.mensajes[i].texto) !== ""
+        ) {
+          html +=
+            "<li>" +
+            escaparHtmlEvaluacion(resultado.mensajes[i].texto) +
+            "</li>";
+        }
       }
       html += "</ol>";
     }
@@ -355,8 +382,21 @@
   }
 
   $(document)
+    .off("click", "#archivo_evaluacion")
+    .on("click", "#archivo_evaluacion", function () {
+      limpiarResultadoCargaEvaluacion();
+    });
+
+  $(document)
+    .off("change", "#archivo_evaluacion")
+    .on("change", "#archivo_evaluacion", function () {
+      limpiarResultadoCargaEvaluacion();
+    });
+
+  $(document)
     .off("click", "#btnFiltrarEvaluacionCajeros")
     .on("click", "#btnFiltrarEvaluacionCajeros", function () {
+      limpiarResultadoCargaEvaluacion();
       if (!validarFiltroEvaluacionCajeros()) {
         return;
       }
@@ -366,6 +406,7 @@
   $(document)
     .off("click", "#btnMesActualEvaluacionCajeros")
     .on("click", "#btnMesActualEvaluacionCajeros", function () {
+      limpiarResultadoCargaEvaluacion();
       establecerFiltroMesActualEvaluacion();
       cargarListadoEvaluacionCajeros(1);
     });

@@ -13,6 +13,7 @@ Dim contenidoLinea
 Dim columnas
 Dim usuarioLog
 Dim lineaActual
+Dim intentados
 Dim insertados
 Dim errores
 Dim totalMensajes
@@ -36,6 +37,7 @@ archivoPath = Server.MapPath("../upload/evaluacion_cajeros.csv")
 comentarioGeneral = Trim(Request("eva_com"))
 insertados = 0
 errores = 0
+intentados = 0
 totalMensajes = -1
 resultadoCarga = "OK"
 pesoArchivo = 0
@@ -122,15 +124,20 @@ Function SqlFecha(valorFecha)
     SqlFecha = Year(CDate(valorFecha)) & Right("0" & Month(CDate(valorFecha)), 2) & Right("0" & Day(CDate(valorFecha)), 2)
 End Function
 
-Sub ResponderJson(resultado, insertadosTotal, erroresTotal, mensajesLista, archivo, peso)
+Sub ResponderJson(resultado, intentadosTotal, insertadosTotal, erroresTotal, mensajesLista, archivo, peso)
     Dim i
-    Response.Write "{""resultado"":""" & JsonSafe(resultado) & """,""insertados"":" & insertadosTotal & ",""errores"":" & erroresTotal & ",""archivo"":""" & JsonSafe(archivo) & """,""peso"":""" & JsonSafe(peso) & """,""mensajes"":"
+    Dim tieneMensajePrevio
+    Response.Write "{""resultado"":""" & JsonSafe(resultado) & """,""intentados"":" & intentadosTotal & ",""insertados"":" & insertadosTotal & ",""errores"":" & erroresTotal & ",""archivo"":""" & JsonSafe(archivo) & """,""peso"":""" & JsonSafe(peso) & """,""mensajes"":"
     Response.Write "["
+    tieneMensajePrevio = False
     For i = 0 To UBound(mensajesLista)
-        If i > 0 Then
-            Response.Write ","
+        If Trim(CStr(mensajesLista(i) & "")) <> "" Then
+            If tieneMensajePrevio Then
+                Response.Write ","
+            End If
+            Response.Write "{""texto"":""" & JsonSafe(mensajesLista(i)) & """}"
+            tieneMensajePrevio = True
         End If
-        Response.Write "{""texto"":""" & JsonSafe(mensajesLista(i)) & """}"
     Next
     Response.Write "]}"
 End Sub
@@ -143,7 +150,7 @@ Set fs = Server.CreateObject("Scripting.FileSystemObject")
 If Not fs.FileExists(archivoPath) Then
     ReDim mensajes(0)
     mensajes(0) = "No se encontro el archivo CSV cargado para procesar."
-    Call ResponderJson("ERROR", 0, 1, mensajes, "evaluacion_cajeros.csv", "")
+    Call ResponderJson("ERROR", 0, 0, 1, mensajes, "evaluacion_cajeros.csv", "")
     Response.End
 End If
 
@@ -154,7 +161,7 @@ If Err.Number <> 0 Then
     ReDim mensajes(0)
     mensajes(0) = "No fue posible abrir el archivo cargado: " & Err.Description
     Err.Clear
-    Call ResponderJson("ERROR", 0, 1, mensajes, "evaluacion_cajeros.csv", "")
+    Call ResponderJson("ERROR", 0, 0, 1, mensajes, "evaluacion_cajeros.csv", "")
     Response.End
 End If
 On Error GoTo 0
@@ -165,6 +172,7 @@ Do Until archivoTexto.AtEndOfStream
     lineaActual = lineaActual + 1
 
     If contenidoLinea <> "" Then
+        intentados = intentados + 1
         columnas = Split(contenidoLinea, ";")
 
         If UBound(columnas) < 5 Then
@@ -197,10 +205,6 @@ Do Until archivoTexto.AtEndOfStream
                 Set rsDup = db.Execute(sqlDup)
 
                 If Not rsDup.EOF Then
-                    errores = errores + 1
-                    totalMensajes = totalMensajes + 1
-                    ReDim Preserve mensajes(totalMensajes)
-                    mensajes(totalMensajes) = "Linea " & lineaActual & ": ya existe una evaluacion con los mismos datos para el cajero."
                 Else
                     Set cmd = Server.CreateObject("ADODB.Command")
                     Set cmd.ActiveConnection = db
@@ -250,9 +254,6 @@ Do Until archivoTexto.AtEndOfStream
                             mensajes(totalMensajes) = "Linea " & lineaActual & ": " & mensajeSp
                         Else
                             insertados = insertados + 1
-                            totalMensajes = totalMensajes + 1
-                            ReDim Preserve mensajes(totalMensajes)
-                            mensajes(totalMensajes) = "Linea " & lineaActual & ": registro cargado correctamente para " & rutEva & "."
                         End If
                     End If
 
@@ -297,5 +298,5 @@ If errores > 0 And insertados = 0 Then
     resultadoCarga = "ERROR"
 End If
 
-Call ResponderJson(resultadoCarga, insertados, errores, mensajes, "evaluacion_cajeros.csv", FormatearPeso(pesoArchivo))
+Call ResponderJson(resultadoCarga, intentados, insertados, errores, mensajes, "evaluacion_cajeros.csv", FormatearPeso(pesoArchivo))
 %>

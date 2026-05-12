@@ -4,7 +4,7 @@ Response.Expires = -1
 Response.CodePage = 65001
 Response.ContentType = "application/vnd.ms-excel"
 Response.Charset = "utf-8"
-Response.AddHeader "Content-Disposition", "attachment; filename=maestro_reportes_evaluacion_" & Replace(Date(), "/", "-") & ".xls"
+Response.AddHeader "Content-Disposition", "attachment; filename=maestro_reportes_evaluacion_" & Right("0" & Day(Date()), 2) & "-" & Right("0" & Month(Date()), 2) & "-" & Year(Date()) & ".xls"
 
 Function XmlSafe(valor)
   If IsNull(valor) Then valor = ""

@@ -1,6 +1,7 @@
 <!--#include file="../conexion/conexion.asp"-->
 <%
 Response.Expires = -1
+Response.CodePage = 65001
 Response.ContentType = "application/vnd.ms-excel"
 Response.Charset = "utf-8"
 Response.AddHeader "Content-Disposition", "attachment; filename=maestro_reportes_evaluacion_" & Replace(Date(), "/", "-") & ".xls"
@@ -122,7 +123,7 @@ If IsArray(preguntas) Then
 Else
   totalPreguntas = -1
 End If
-%><?xml version="1.0"?>
+%><?xml version="1.0" encoding="UTF-8"?>
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
  xmlns:o="urn:schemas-microsoft-com:office:office"
@@ -154,7 +155,6 @@ End If
         Call EscribirCelda("Comentario Central", "Header")
         Call EscribirCelda("Fecha Evaluacion", "Header")
         Call EscribirCelda("Fecha Envio Capacitacion", "Header")
-        Call EscribirCelda("Comentario JEPS", "Header")
         %>
       </Row>
       <%
@@ -183,7 +183,6 @@ End If
         Call EscribirCelda(datos(8, i), "")
         Call EscribirCelda(FechaTextoMr(datos(6, i)), "")
         Call EscribirCelda(FechaTextoMr(datos(5, i)), "")
-        Call EscribirCelda(datos(7, i), "")
         %>
       </Row>
       <%

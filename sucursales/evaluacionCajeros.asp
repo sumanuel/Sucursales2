@@ -34,6 +34,86 @@ Function FormatearFechaDMY(valorFecha)
   End If
 End Function
 
+Function FormatearFechaISO(valorFecha)
+  If IsNull(valorFecha) Or Trim(CStr(valorFecha)) = "" Then
+    FormatearFechaISO = ""
+  Else
+    FormatearFechaISO = Year(CDate(valorFecha)) & "-" & Right("0" & Month(CDate(valorFecha)), 2) & "-" & Right("0" & Day(CDate(valorFecha)), 2)
+  End If
+End Function
+
+Function PrimerValorParametro(valor)
+  Dim texto, partes
+  If IsNull(valor) Then
+    PrimerValorParametro = ""
+    Exit Function
+  End If
+
+  texto = Trim(CStr(valor))
+  If texto = "" Then
+    PrimerValorParametro = ""
+    Exit Function
+  End If
+
+  If InStr(texto, ",") > 0 Then
+    partes = Split(texto, ",")
+    texto = partes(0)
+  End If
+
+  PrimerValorParametro = Trim(texto)
+End Function
+
+Function NormalizarFechaFiltro(valor)
+  Dim texto, partes
+  texto = PrimerValorParametro(valor)
+
+  If texto = "" Then
+    NormalizarFechaFiltro = ""
+  ElseIf Len(texto) = 10 And Mid(texto, 5, 1) = "-" And Mid(texto, 8, 1) = "-" Then
+    NormalizarFechaFiltro = texto
+  ElseIf Len(texto) = 10 And Mid(texto, 3, 1) = "/" And Mid(texto, 6, 1) = "/" Then
+    partes = Split(texto, "/")
+    If UBound(partes) = 2 Then
+      NormalizarFechaFiltro = partes(2) & "-" & Right("0" & partes(1), 2) & "-" & Right("0" & partes(0), 2)
+    Else
+      NormalizarFechaFiltro = ""
+    End If
+  Else
+    NormalizarFechaFiltro = ""
+  End If
+End Function
+
+Function NormalizarEstadoFiltro(valor)
+  Dim texto
+  texto = PrimerValorParametro(valor)
+  If texto = "1" Or texto = "2" Or texto = "3" Then
+    NormalizarEstadoFiltro = texto
+  Else
+    NormalizarEstadoFiltro = ""
+  End If
+End Function
+
+Function EtiquetaEstadoFiltro(valor)
+  Select Case CStr(valor)
+    Case "1"
+      EtiquetaEstadoFiltro = "EN CAPACITACION"
+    Case "2"
+      EtiquetaEstadoFiltro = "APROBADA"
+    Case "3"
+      EtiquetaEstadoFiltro = "RECHAZADA"
+    Case Else
+      EtiquetaEstadoFiltro = ""
+  End Select
+End Function
+
+Function PrimerDiaMesActualISO()
+  PrimerDiaMesActualISO = Year(Date()) & "-" & Right("0" & Month(Date()), 2) & "-01"
+End Function
+
+Function UltimoDiaMesActualISO()
+  UltimoDiaMesActualISO = FormatearFechaISO(DateSerial(Year(Date()), Month(Date()) + 1, 0))
+End Function
+
 Function EstadoClase(valorEstado)
   Dim estadoTexto
   estadoTexto = UCase(Trim(valorEstado & ""))
@@ -53,11 +133,29 @@ Dim perfilMain, idSucursal, sqlSucursal, rsSucursal, nombreSucursal
 Dim sqlEva, rsEva, sqlPreguntas, rsPreguntas
 Dim tieneEvaluaciones, tienePreguntas, primeraColumnaEva, primeraColumnaPre
 Dim preguntasData, totalPreguntas, idxPregunta
+Dim filtroDesde, filtroHasta, filtroEstado, paginaActual
+Dim datosEva, totalRegistros, totalPaginas, inicioIndice, finIndice, indiceRegistro
+Dim etiquetaFiltro, mensajeSinDatos, estadoFila, fechaFilaIso
+Dim fechaPrimerDiaMesIso, fechaUltimoDiaMesIso
 
 perfilMain = Trim(Request("perfilMain") & "")
 idSucursal = Trim(Request("idSucursalMain") & "")
 nombreSucursal = ""
 totalPreguntas = 0
+filtroDesde = NormalizarFechaFiltro(Request("fch_desde"))
+filtroHasta = NormalizarFechaFiltro(Request("fch_hasta"))
+filtroEstado = NormalizarEstadoFiltro(Request("eva_est"))
+paginaActual = 1
+fechaPrimerDiaMesIso = PrimerDiaMesActualISO()
+fechaUltimoDiaMesIso = UltimoDiaMesActualISO()
+
+If filtroDesde = "" Then filtroDesde = fechaPrimerDiaMesIso
+If filtroHasta = "" Then filtroHasta = fechaUltimoDiaMesIso
+
+If PrimerValorParametro(Request("page")) <> "" And IsNumeric(PrimerValorParametro(Request("page"))) Then
+  paginaActual = CLng(PrimerValorParametro(Request("page")))
+End If
+If paginaActual <= 0 Then paginaActual = 1
 
 If perfilMain <> "" And perfilMain <> "1" Then
 %>
@@ -89,7 +187,25 @@ End If
 If rsSucursal.State = 1 Then rsSucursal.Close
 Set rsSucursal = Nothing
 
-sqlEva = "EXEC dbo.SP_SUC_listar_eva_cajero @ID_SUCURSAL = " & CLng(idSucursal) & ", @TOP_REGISTROS = 200, @VALIDAR_FECHA_DESDE = 1"
+sqlEva = "SELECT TOP 5000 " & _
+         "eva.ID_EVA, eva.EVA_RUT, eva.EVA_NOMBRE, suc.suc_nombre AS EVA_SUC, eva.EVA_EMP, " & _
+         "eva.EVA_FCH_DES, eva.EVA_FCH_HAS, eva.EVA_COM, " & _
+         "CASE eva.EVA_EST WHEN 1 THEN 'EN CAPACITACION' WHEN 2 THEN 'APROBADA' WHEN 3 THEN 'RECHAZADA' ELSE CAST(eva.EVA_EST AS VARCHAR(10)) END AS EVA_EST, " & _
+         "eva.EVA_USR, eva.EVA_FCH " & _
+         "FROM dbo.SUC_CAP_EVA eva " & _
+         "INNER JOIN dbo.SUC_sucursal suc ON eva.EVA_SUC = suc.id_sucursal " & _
+         "WHERE eva.EVA_SUC = " & CLng(idSucursal) & " " & _
+         "AND eva.EVA_FCH_DES <= CONVERT(DATE, GETDATE()) "
+If filtroDesde <> "" Then
+  sqlEva = sqlEva & "AND CONVERT(DATE, eva.EVA_FCH_DES) >= '" & filtroDesde & "' "
+End If
+If filtroHasta <> "" Then
+  sqlEva = sqlEva & "AND CONVERT(DATE, eva.EVA_FCH_DES) <= '" & filtroHasta & "' "
+End If
+If filtroEstado <> "" Then
+  sqlEva = sqlEva & "AND eva.EVA_EST = " & filtroEstado & " "
+End If
+sqlEva = sqlEva & "ORDER BY eva.ID_EVA DESC"
 Set rsEva = DB.Execute(sqlEva)
 
 tieneEvaluaciones = False
@@ -97,7 +213,9 @@ primeraColumnaEva = ""
 If Not rsEva.EOF Then
   primeraColumnaEva = UCase(Trim(rsEva.Fields(0).Name & ""))
   If primeraColumnaEva <> "RESULTADO" Then
-    tieneEvaluaciones = True
+    datosEva = rsEva.GetRows()
+    totalRegistros = UBound(datosEva, 2)
+    tieneEvaluaciones = (totalRegistros >= 0)
   End If
 End If
 
@@ -134,6 +252,33 @@ End If
   <div class="row-fluid">
     <div class="span12">
       <div class="well">
+        <form class="js-form-filtros-evaluacion-cajeros" onsubmit="return false;" style="margin: 0;">
+        <div class="row-fluid" style="margin-bottom: 15px;">
+          <div class="span3">
+            <label style="font-weight: bold; margin-bottom: 3px;">Desde</label>
+            <input type="date" id="filtro_eva_desde_suc" name="fch_desde" class="span12 js-filtro-eva-desde-suc" value="<%=TextoSeguro(filtroDesde)%>" />
+          </div>
+          <div class="span3">
+            <label style="font-weight: bold; margin-bottom: 3px;">Hasta</label>
+            <input type="date" id="filtro_eva_hasta_suc" name="fch_hasta" class="span12 js-filtro-eva-hasta-suc" value="<%=TextoSeguro(filtroHasta)%>" />
+          </div>
+          <div class="span3">
+            <label style="font-weight: bold; margin-bottom: 3px;">Estado</label>
+            <select id="filtro_eva_estado_suc" name="eva_est" class="span12 js-filtro-eva-estado-suc">
+              <option value="">[TODOS]</option>
+              <option value="1" <%If filtroEstado = "1" Then Response.Write("selected=""selected""") End If%>>EN CAPACITACION</option>
+              <option value="2" <%If filtroEstado = "2" Then Response.Write("selected=""selected""") End If%>>APROBADA</option>
+              <option value="3" <%If filtroEstado = "3" Then Response.Write("selected=""selected""") End If%>>RECHAZADA</option>
+            </select>
+          </div>
+          <div class="span3" style="padding-top: 23px; text-align: right;">
+            <button type="button" class="btn btn-primary" id="btnFiltrarEvaluacionCajerosSuc">
+              <i class="icon-search icon-white"></i> Filtrar
+            </button>
+            <button type="button" class="btn" id="btnMesActualEvaluacionCajerosSuc">Mes actual</button>
+          </div>
+        </div>
+        </form>
         <h4 style="margin-top:0;">Cajeros pendientes o disponibles para evaluacion</h4>
         <%
         If primeraColumnaEva = "RESULTADO" Then
@@ -142,10 +287,28 @@ End If
         <%
         ElseIf Not tieneEvaluaciones Then
         %>
-          <div class="alert alert-info">No hay cajeros disponibles para evaluacion en esta sucursal.</div>
+          <div class="alert alert-info">No hay cajeros disponibles para evaluacion con los filtros seleccionados.</div>
         <%
         Else
+          totalPaginas = Int((UBound(datosEva, 2) + 1) / 12)
+          If ((UBound(datosEva, 2) + 1) Mod 12) > 0 Then totalPaginas = totalPaginas + 1
+          If totalPaginas <= 0 Then totalPaginas = 1
+          If paginaActual > totalPaginas Then paginaActual = totalPaginas
+          inicioIndice = (paginaActual - 1) * 12
+          finIndice = inicioIndice + 11
+          If finIndice > UBound(datosEva, 2) Then finIndice = UBound(datosEva, 2)
         %>
+          <div class="alert alert-info" style="margin-bottom: 12px;">
+            <strong>Filtro aplicado:</strong>
+            <%If filtroDesde <> "" Then Response.Write("Desde " & TextoSeguro(FormatearFechaDMY(filtroDesde))) Else Response.Write("Desde inicio") End If%>
+            |
+            <%If filtroHasta <> "" Then Response.Write("Hasta " & TextoSeguro(FormatearFechaDMY(filtroHasta))) Else Response.Write("Hasta hoy") End If%>
+            <%If filtroEstado <> "" Then%>
+              |
+              Estado
+              <%=TextoSeguro(EtiquetaEstadoFiltro(filtroEstado))%>
+            <%End If%>
+          </div>
           <table class="table table-bordered table-striped table-hover">
             <thead>
               <tr>
@@ -160,26 +323,26 @@ End If
             </thead>
             <tbody>
               <%
-              Do While Not rsEva.EOF
+              For indiceRegistro = inicioIndice To finIndice
               %>
               <tr>
-                <td><%=TextoSeguro(rsEva("EVA_RUT"))%></td>
-                <td><%=TextoSeguro(rsEva("EVA_NOMBRE"))%></td>
-                <td><%=TextoSeguro(rsEva("EVA_EMP"))%></td>
-                <td><%=TextoSeguro(FormatearFechaDMY(rsEva("EVA_FCH_DES")))%></td>
-                <td><%=TextoSeguro(FormatearFechaDMY(rsEva("EVA_FCH_HAS")))%></td>
-                <td><span class="<%=EstadoClase(rsEva("EVA_EST"))%>"><%=TextoSeguro(rsEva("EVA_EST"))%></span></td>
+                <td><%=TextoSeguro(datosEva(1, indiceRegistro))%></td>
+                <td><%=TextoSeguro(datosEva(2, indiceRegistro))%></td>
+                <td><%=TextoSeguro(datosEva(4, indiceRegistro))%></td>
+                <td><%=TextoSeguro(FormatearFechaDMY(datosEva(5, indiceRegistro)))%></td>
+                <td><%=TextoSeguro(FormatearFechaDMY(datosEva(6, indiceRegistro)))%></td>
+                <td><span class="<%=EstadoClase(datosEva(8, indiceRegistro))%>"><%=TextoSeguro(datosEva(8, indiceRegistro))%></span></td>
                 <td style="text-align:center;">
                   <%
-                  If tienePreguntas And UCase(Trim(rsEva("EVA_EST") & "")) = "EN CAPACITACION" Then
+                  If tienePreguntas And UCase(Trim(datosEva(8, indiceRegistro) & "")) = "EN CAPACITACION" Then
                   %>
                     <button
                       type="button"
                       class="btn btn-mini btn-primary btnAbrirFormularioEvaluacion"
-                      data-id-eva="<%=TextoSeguro(rsEva("ID_EVA"))%>"
-                      data-rut="<%=TextoSeguro(rsEva("EVA_RUT"))%>"
-                      data-nombre="<%=TextoSeguro(rsEva("EVA_NOMBRE"))%>"
-                      data-empresa="<%=TextoSeguro(rsEva("EVA_EMP"))%>"
+                      data-id-eva="<%=TextoSeguro(datosEva(0, indiceRegistro))%>"
+                      data-rut="<%=TextoSeguro(datosEva(1, indiceRegistro))%>"
+                      data-nombre="<%=TextoSeguro(datosEva(2, indiceRegistro))%>"
+                      data-empresa="<%=TextoSeguro(datosEva(4, indiceRegistro))%>"
                     >
                       <i class="icon-check icon-white"></i> Evaluar
                     </button>
@@ -193,11 +356,44 @@ End If
                 </td>
               </tr>
               <%
-                rsEva.MoveNext
-              Loop
+              Next
               %>
             </tbody>
           </table>
+          <%
+          If totalPaginas > 1 Then
+            Dim inicioRango, finRango
+            inicioRango = paginaActual - 2
+            finRango = paginaActual + 2
+            If inicioRango < 1 Then inicioRango = 1
+            If finRango > totalPaginas Then finRango = totalPaginas
+          %>
+          <div class="pagination" style="text-align:center; margin-top:15px;">
+            <ul>
+              <%If paginaActual > 1 Then%>
+                <li><a href="#" class="btn-pagina-evaluacion-suc" data-pagina="<%=paginaActual - 1%>">« Anterior</a></li>
+              <%Else%>
+                <li class="disabled"><a href="#">« Anterior</a></li>
+              <%End If%>
+
+              <%For indiceRegistro = inicioRango To finRango%>
+                <%If indiceRegistro = paginaActual Then%>
+                  <li class="active"><a href="#"><%=indiceRegistro%></a></li>
+                <%Else%>
+                  <li><a href="#" class="btn-pagina-evaluacion-suc" data-pagina="<%=indiceRegistro%>"><%=indiceRegistro%></a></li>
+                <%End If%>
+              <%Next%>
+
+              <%If paginaActual < totalPaginas Then%>
+                <li><a href="#" class="btn-pagina-evaluacion-suc" data-pagina="<%=paginaActual + 1%>">Siguiente »</a></li>
+              <%Else%>
+                <li class="disabled"><a href="#">Siguiente »</a></li>
+              <%End If%>
+            </ul>
+          </div>
+          <%
+          End If
+          %>
         <%
         End If
         %>
@@ -293,6 +489,11 @@ End If
 </div>
 
 <script type="text/javascript">
+  var evaluacionCajerosContexto = {
+    perfilMain: "<%=TextoJS(perfilMain)%>",
+    idSucursalMain: "<%=TextoJS(idSucursal)%>"
+  };
+
   function mostrarResultadoModuloEvaluacion(tipo, titulo, mensaje) {
     var clase = tipo === "OK" ? "alert-success" : "alert-error";
     var html = '';
@@ -343,15 +544,101 @@ End If
   }
 
   function recargarModuloEvaluacionCajeros() {
+    var modulo = obtenerModuloEvaluacionActivo();
+    var pagina = $.trim(modulo.find(".pagination li.active a").first().text() || "1");
+    if (pagina === "" || isNaN(pagina)) {
+      pagina = "1";
+    }
+    cargarListadoEvaluacionCajerosSucursal(parseInt(pagina, 10), modulo);
+  }
+
+  function obtenerModuloEvaluacionActivo(origen) {
+    var modulo = $();
+
+    if (origen && !origen.jquery) {
+      origen = $(origen);
+    }
+
+    if (origen && origen.length) {
+      modulo = origen.closest("#moduloEvaluacionCajeros");
+    }
+
+    if (!modulo.length) {
+      modulo = $("#area #moduloEvaluacionCajeros:visible").first();
+    }
+
+    if (!modulo.length) {
+      modulo = $("#indicesZOnal #moduloEvaluacionCajeros:visible").first();
+    }
+
+    if (!modulo.length) {
+      modulo = $("#moduloEvaluacionCajeros:visible").first();
+    }
+
+    if (!modulo.length) {
+      modulo = $("#moduloEvaluacionCajeros").last();
+    }
+
+    return modulo;
+  }
+
+  function cargarListadoEvaluacionCajerosSucursal(pagina, origen) {
+    var modulo = obtenerModuloEvaluacionActivo(origen);
+    var formulario = modulo.find(".js-form-filtros-evaluacion-cajeros").first();
+    var campoDesde = modulo.find(".js-filtro-eva-desde-suc").first();
+    var campoHasta = modulo.find(".js-filtro-eva-hasta-suc").first();
+    var campoEstado = modulo.find(".js-filtro-eva-estado-suc").first();
     var divDestino = "area";
-    if ($("#indicesZOnal").find("#moduloEvaluacionCajeros").length > 0) {
+    if (modulo.closest("#indicesZOnal").length > 0) {
       divDestino = "indicesZOnal";
     }
+    if (campoDesde.length) {
+      campoDesde.val($.trim(campoDesde.val() || ""));
+    }
+    if (campoHasta.length) {
+      campoHasta.val($.trim(campoHasta.val() || ""));
+    }
+    if (campoEstado.length) {
+      campoEstado.val($.trim(campoEstado.val() || ""));
+    }
+    var datos = "page=" + encodeURIComponent(pagina || 1);
+    if (formulario.length) {
+      datos += "&" + formulario.serialize();
+    }
     try {
-      enviaDatos("sucursales/evaluacionCajeros.asp", divDestino, "");
+      enviaDatos("sucursales/evaluacionCajeros.asp", divDestino, datos);
     } catch (err) {
     }
   }
+
+  $(document)
+    .off("click", "#btnFiltrarEvaluacionCajerosSuc")
+    .on("click", "#btnFiltrarEvaluacionCajerosSuc", function () {
+      cargarListadoEvaluacionCajerosSucursal(1, $(this));
+    });
+
+  $(document)
+    .off("click", "#btnMesActualEvaluacionCajerosSuc")
+    .on("click", "#btnMesActualEvaluacionCajerosSuc", function () {
+      var modulo = obtenerModuloEvaluacionActivo($(this));
+      var campoDesde = modulo.find(".js-filtro-eva-desde-suc").first();
+      var campoHasta = modulo.find(".js-filtro-eva-hasta-suc").first();
+      var campoEstado = modulo.find(".js-filtro-eva-estado-suc").first();
+      var hoy = new Date();
+      var primerDia = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+      var ultimoDia = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+      campoDesde.val(primerDia.getFullYear() + "-" + ("0" + (primerDia.getMonth() + 1)).slice(-2) + "-" + ("0" + primerDia.getDate()).slice(-2));
+      campoHasta.val(ultimoDia.getFullYear() + "-" + ("0" + (ultimoDia.getMonth() + 1)).slice(-2) + "-" + ("0" + ultimoDia.getDate()).slice(-2));
+      campoEstado.val("");
+      cargarListadoEvaluacionCajerosSucursal(1, modulo);
+    });
+
+  $(document)
+    .off("click", ".btn-pagina-evaluacion-suc")
+    .on("click", ".btn-pagina-evaluacion-suc", function (e) {
+      e.preventDefault();
+      cargarListadoEvaluacionCajerosSucursal($(this).data("pagina"), $(this));
+    });
 
   $(document)
     .off("click", ".btnAbrirFormularioEvaluacion")

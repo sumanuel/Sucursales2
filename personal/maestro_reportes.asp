@@ -41,9 +41,9 @@
             <button
               type="button"
               class="btn btn-success"
-              id="btnExportarMaestroReportesCsv"
+              id="btnExportarMaestroReportesExcel"
             >
-              <i class="icon-download-alt icon-white"></i> Exportar CSV
+              <i class="icon-download-alt icon-white"></i> Exportar Excel
             </button>
           </div>
         </div>
@@ -428,14 +428,14 @@
     });
 
   $(document)
-    .off("click", "#btnExportarMaestroReportesCsv")
-    .on("click", "#btnExportarMaestroReportesCsv", function () {
+    .off("click", "#btnExportarMaestroReportesExcel")
+    .on("click", "#btnExportarMaestroReportesExcel", function () {
       if (!mrValidarFiltros()) {
         return;
       }
       var filtros = mrObtenerFiltros();
       window.open(
-        "maestro_reportes_exportar_csv.asp?" + $.param(filtros),
+        "maestro_reportes_exportar_excel.asp?" + $.param(filtros),
         "_blank",
       );
     });

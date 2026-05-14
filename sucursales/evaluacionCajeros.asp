@@ -693,6 +693,11 @@ End If
         return;
       }
 
+      var textoEstado = $.trim($("#eval_estado option:selected").text() || "");
+      if (!confirm("Confirma guardar la evaluacion con estado " + textoEstado + "?")) {
+        return;
+      }
+
       $.ajax({
         type: "POST",
         url: "sucursales/evaluacionCajeros_guardar.asp",

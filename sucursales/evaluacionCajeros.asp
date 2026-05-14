@@ -312,6 +312,7 @@ End If
           <table class="table table-bordered table-striped table-hover">
             <thead>
               <tr>
+                <th>ID</th>
                 <th>Rut</th>
                 <th>Nombre</th>
                 <th>Empresa</th>
@@ -326,6 +327,7 @@ End If
               For indiceRegistro = inicioIndice To finIndice
               %>
               <tr>
+                <td><%=TextoSeguro(datosEva(0, indiceRegistro))%></td>
                 <td><%=TextoSeguro(datosEva(1, indiceRegistro))%></td>
                 <td><%=TextoSeguro(datosEva(2, indiceRegistro))%></td>
                 <td><%=TextoSeguro(datosEva(4, indiceRegistro))%></td>

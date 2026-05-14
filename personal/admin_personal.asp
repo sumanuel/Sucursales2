@@ -693,8 +693,8 @@ if not rs.eof then
                                             <option value="">Todas</option>
                                         </select>
                                     </td>
-                                    <td align="right" class="TextoNegro"><strong>Tipo Acción:</strong></td>
-                                    <td>
+                                    <td align="right" class="TextoNegro" style="display:none;"><strong>Tipo Acción:</strong></td>
+                                    <td style="display:none;">
                                         <select name="tipo_accion_log" id="tipo_accion_log" class="input-medium">
                                             <option value="">Todas</option>
                                         </select>

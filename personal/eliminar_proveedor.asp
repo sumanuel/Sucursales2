@@ -7,11 +7,21 @@ Response.Charset = "utf-8"
 <%
 On Error Resume Next
 Dim id: id = Request.Form("id")
+Dim usuario, logon_user
 If id = "" Then
     Response.Write "{""resultado"":""ERROR"",""mensaje"":""ID requerido""}"
     Response.End
 End If
-Dim sql: sql = "EXEC SP_SUC_eliminar_proveedor @id_proveedor=" & CInt(id)
+logon_user = Request.ServerVariables("LOGON_USER")
+If InStr(logon_user, "\") > 0 Then
+    usuario = Mid(logon_user, InStr(logon_user, "\") + 1)
+Else
+    usuario = logon_user
+End If
+If Trim(usuario) = "" Then
+    usuario = "SISTEMA"
+End If
+Dim sql: sql = "EXEC SP_SUC_eliminar_proveedor @id_proveedor=" & CInt(id) & ", @usuario='" & Replace(usuario, "'", "''") & "'"
 Dim rs: Set rs = db.Execute(sql)
 If Err.Number <> 0 Then
     Response.Write "{""resultado"":""ERROR"",""mensaje"":""" & Replace(Err.Description, """", "'") & """}"

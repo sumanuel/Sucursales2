@@ -3,12 +3,13 @@
 <%
 Response.ContentType = "application/json"
 
-dim usuarioLog, perfilLog, funcionalidad, tipoAccion
+dim usuarioLog, perfilLog, funcionalidad, tipoAccion, idRegistro
 dim idUsrWin, usuarios, usuarioWin, dominio
 
 'Obtener parámetros de la petición
 funcionalidad = trim(request("funcionalidad"))
 tipoAccion = trim(request("tipo_accion"))
+idRegistro = trim(request("id_registro"))
 
 'Obtener usuario de Windows (LOGON_USER)
 idUsrWin = request.servervariables("LOGON_USER")
@@ -69,9 +70,13 @@ end if
 
 'Validar y registrar
 if funcionalidad <> "" and tipoAccion <> "" then
-call registrarLog(usuarioLog, perfilLog, funcionalidad, tipoAccion)
-Response.Write("{""status"":""ok"",""message"":""Log registrado"",""usuario"":""" & usuarioLog & """,""perfil"":""" & perfilLog & """}")
+if idRegistro <> "" and IsNumeric(idRegistro) then
+call registrarLogConId(usuarioLog, perfilLog, funcionalidad, tipoAccion, CLng(idRegistro))
 else
-Response.Write("{""status"":""error"",""message"":""Faltan parametros"",""funcionalidad"":""" & funcionalidad & """,""tipo_accion"":""" & tipoAccion & """}")
+call registrarLog(usuarioLog, perfilLog, funcionalidad, tipoAccion)
+end if
+Response.Write("{""status"":""ok"",""message"":""Log registrado"",""usuario"":""" & usuarioLog & """,""perfil"":""" & perfilLog & """,""id_registro"":""" & idRegistro & """}")
+else
+Response.Write("{""status"":""error"",""message"":""Faltan parametros"",""funcionalidad"":""" & funcionalidad & """,""tipo_accion"":""" & tipoAccion & """,""id_registro"":""" & idRegistro & """}")
 end if
 %>

@@ -380,8 +380,9 @@ $('#btnExportarExcelModal').on('click', function(){
                                     cargarTablaSolicitudesPaginada(1);
                                     
                                     // Registrar log
-                                    var accion = datos.id_solicitud == '0' ? 'Crear solicitud cajero adicional' : 'Editar solicitud cajero adicional';
-                                    registrarLog('Solicitud Cajeros Adicionales', accion);
+                                    // var accion = datos.id_solicitud == '0' ? 'Crear solicitud cajero adicional' : 'Editar solicitud cajero adicional';
+                                    // var idLog = response.id || datos.id_solicitud || '';
+                                    // registrarLog('Solicitud Cajeros Adicionales', accion, idLog);
                                 } else {
                                     alert('Alerta: ' + response.mensaje);
                                 }
@@ -709,13 +710,17 @@ $('#btnExportarExcelModal').on('click', function(){
 </div>
 
 <script type="text/javascript">
-function registrarLog(funcionalidad, tipoAccion) {
+function registrarLog(funcionalidad, tipoAccion, idRegistro) {
+    var datosLog = {
+        funcionalidad: funcionalidad,
+        tipo_accion: tipoAccion
+    };
+    if (idRegistro !== undefined && idRegistro !== null && $.trim(idRegistro.toString()) !== '') {
+        datosLog.id_registro = idRegistro;
+    }
     $.ajax({
         url: 'personal/registrar_log.asp',
-        data: {
-            funcionalidad: funcionalidad,
-            tipo_accion: tipoAccion
-        },
+        data: datosLog,
         type: 'POST',
         dataType: 'json',
         async: true,
@@ -1229,7 +1234,7 @@ $('#btnGuardarEstado').on('click', function(){
                 cargarTablaSolicitudesPaginada(1);
                 
                 // Registrar log del cambio de estado
-                registrarLog('Solicitud Cajeros Adicionales', 'Cambiar estado a ' + nombreEstado);
+                // registrarLog('Solicitud Cajeros Adicionales', 'Cambiar estado a ' + nombreEstado, idSolicitud);
             } else {
                 alert('Alerta: ' + response.mensaje);
             }

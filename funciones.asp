@@ -443,20 +443,28 @@ function obtieneIdSucursal(idUsuario)
 	obtieneIdSucursal = idSucursal
 end function
 
-'Función para registrar log de eventos del usuario
+'Funciï¿½n para registrar log de eventos del usuario
 sub registrarLog(usuario, perfil, funcionalidad, tipo_accion)
+	call registrarLogConId(usuario, perfil, funcionalidad, tipo_accion, "")
+end sub
+
+sub registrarLogConId(usuario, perfil, funcionalidad, tipo_accion, id_registro)
 	on error resume next
 	
 	'Obtener fecha y hora actual
-	dim fechaActual, horaActual
+	dim fechaActual, horaActual, idRegistroSql
 	fechaActual = Date()
 	horaActual = Time()
+	idRegistroSql = "NULL"
 	
 	'Escapar comillas simples para evitar errores SQL
 	usuario = Replace(usuario, "'", "''")
 	perfil = Replace(perfil, "'", "''")
 	funcionalidad = Replace(funcionalidad, "'", "''")
 	tipo_accion = Replace(tipo_accion, "'", "''")
+	If Trim(id_registro & "") <> "" And IsNumeric(id_registro) Then
+		idRegistroSql = CLng(id_registro)
+	End If
 	
 	'Construir la consulta SQL
 	dim sqlLog
@@ -466,7 +474,8 @@ sub registrarLog(usuario, perfil, funcionalidad, tipo_accion)
 	sqlLog = sqlLog & "'" & funcionalidad & "', "
 	sqlLog = sqlLog & "'" & tipo_accion & "', "
 	sqlLog = sqlLog & "'" & fechaActual & "', "
-	sqlLog = sqlLog & "'" & horaActual & "'"
+	sqlLog = sqlLog & "'" & horaActual & "', "
+	sqlLog = sqlLog & idRegistroSql
 	
 	'Ejecutar el stored procedure
 	DB.Execute(sqlLog)

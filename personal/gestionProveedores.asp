@@ -208,13 +208,17 @@ set rsProveedores = nothing
 </div>
 
 <script type="text/javascript">
-function registrarLog(funcionalidad, tipoAccion) {
+function registrarLog(funcionalidad, tipoAccion, idRegistro) {
+  var datosLog = {
+    funcionalidad: funcionalidad,
+    tipo_accion: tipoAccion
+  };
+  if (idRegistro !== undefined && idRegistro !== null && $.trim(idRegistro.toString()) !== '') {
+    datosLog.id_registro = idRegistro;
+  }
     $.ajax({
         url: 'registrar_log.asp',
-        data: {
-            funcionalidad: funcionalidad,
-            tipo_accion: tipoAccion
-        },
+    data: datosLog,
         type: 'POST',
         dataType: 'json',
         async: true,
@@ -274,8 +278,9 @@ $(document).ready(function() {
           enviaDatos('gestionProveedores.asp', 'tbGestionProveedores', 'carga=carga');
           
           // Registrar log
-          var accion = datos.id_proveedor == "0" ? "Crear proveedor" : "Editar proveedor";
-          registrarLog('Gestion Proveedores', accion);
+          // var accion = datos.id_proveedor == "0" ? "Crear proveedor" : "Editar proveedor";
+          // var idLog = response.id || datos.id_proveedor || "";
+          // registrarLog('Gestion Proveedores', accion, idLog);
         } else {
           alert("Error: " + (response.mensaje || "No se pudo guardar el proveedor"));
         }
@@ -332,7 +337,7 @@ $(document).ready(function() {
         success: function(response) {
           if (response.resultado === "OK") {
             // Estado cambiado correctamente
-            registrarLog('Gestion Proveedores', 'Cambiar estado proveedor a ' + nuevoEstado);
+            // registrarLog('Gestion Proveedores', 'Cambiar estado proveedor a ' + nuevoEstado, id);
           } else {
             alert("Error: " + (response.mensaje || "No se pudo cambiar el estado"));
             checkbox.prop("checked", !checkbox.is(":checked"));

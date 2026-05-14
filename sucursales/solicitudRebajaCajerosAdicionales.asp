@@ -405,8 +405,9 @@ $('#btnExportarExcelRebajaModal').on('click', function(){
                                     cargarTablaSolicitudesPaginada(1);
                                     
                                     // Registrar log
-                                    var accion = datos.id_solicitud_rebaja == '0' ? 'Crear solicitud rebaja cajero adicional' : 'Editar solicitud rebaja cajero adicional';
-                                    registrarLog('Solicitud Rebaja Cajeros Adicionales', accion);
+                                    // var accion = datos.id_solicitud_rebaja == '0' ? 'Crear solicitud rebaja cajero adicional' : 'Editar solicitud rebaja cajero adicional';
+                                    // var idLog = response.id || datos.id_solicitud_rebaja || '';
+                                    // registrarLog('Solicitud Rebaja Cajeros Adicionales', accion, idLog);
                                 } else {
                                     alert('Alerta: ' + response.mensaje);
                                 }
@@ -729,13 +730,17 @@ $('#btnExportarExcelRebajaModal').on('click', function(){
 </div>
 
 <script type="text/javascript">
-function registrarLog(funcionalidad, tipoAccion) {
+function registrarLog(funcionalidad, tipoAccion, idRegistro) {
+    var datosLog = {
+        funcionalidad: funcionalidad,
+        tipo_accion: tipoAccion
+    };
+    if (idRegistro !== undefined && idRegistro !== null && $.trim(idRegistro.toString()) !== '') {
+        datosLog.id_registro = idRegistro;
+    }
     $.ajax({
         url: 'personal/registrar_log.asp',
-        data: {
-            funcionalidad: funcionalidad,
-            tipo_accion: tipoAccion
-        },
+        data: datosLog,
         type: 'POST',
         dataType: 'json',
         async: true,
@@ -1332,7 +1337,7 @@ $('#btnGuardarEstado').on('click', function(){
                 cargarTablaSolicitudesPaginada(1);
                 
                 // Registrar log del cambio de estado
-                registrarLog('Solicitud Rebaja Cajeros Adicionales', 'Cambiar estado a ' + nombreEstado);
+                // registrarLog('Solicitud Rebaja Cajeros Adicionales', 'Cambiar estado a ' + nombreEstado, idSolicitudRebaja);
             } else {
                 alert('Alerta: ' + response.mensaje);
             }

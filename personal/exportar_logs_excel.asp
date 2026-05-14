@@ -122,6 +122,7 @@ else
 		<thead>
 			<tr>
 				<th>#</th>
+				<th>ID Registro</th>
 				<th>Usuario</th>
 				<th>Perfil</th>
 				<th>Funcionalidad</th>
@@ -138,8 +139,12 @@ else
 				
 				do while not rsLogs.EOF
 					contador = contador + 1
-					dim usuarioReg, perfilReg, funcionalidadReg, tipoAccionReg, fechaReg, horaReg
+					dim idRegistroReg, usuarioReg, perfilReg, funcionalidadReg, tipoAccionReg, fechaReg, horaReg
 					
+					idRegistroReg = ""
+					if not IsNull(rsLogs("id_registro")) then
+						idRegistroReg = rsLogs("id_registro")
+					end if
 					usuarioReg = rsLogs("usuario")
 					perfilReg = rsLogs("perfil")
 					funcionalidadReg = rsLogs("funcionalidad")
@@ -149,6 +154,7 @@ else
 			%>
 			<tr>
 				<td><%=contador%></td>
+				<td><%=idRegistroReg%></td>
 				<td><%=Server.HTMLEncode(usuarioReg)%></td>
 				<td><%=Server.HTMLEncode(perfilReg)%></td>
 				<td><%=Server.HTMLEncode(funcionalidadReg)%></td>
@@ -163,7 +169,7 @@ else
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="7" style="text-align: right; font-weight: bold; background-color: #e8e8e8;">
+				<td colspan="8" style="text-align: right; font-weight: bold; background-color: #e8e8e8;">
 					Total de registros: <%=contador%>
 				</td>
 			</tr>
@@ -172,7 +178,7 @@ else
 			else
 			%>
 			<tr>
-				<td colspan="7" style="text-align: center; color: #999;">
+				<td colspan="8" style="text-align: center; color: #999;">
 					No se encontraron registros con los filtros seleccionados
 				</td>
 			</tr>

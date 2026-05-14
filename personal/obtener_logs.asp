@@ -139,6 +139,7 @@ else
 <tbody>
 <tr>
     <td width="5%"><strong>#</strong></td>
+    <td width="8%"><strong>ID Registro</strong></td>
     <td width="12%"><strong>Usuario</strong></td>
     <td width="10%"><strong>Perfil</strong></td>
     <td width="25%"><strong>Funcionalidad</strong></td>
@@ -149,7 +150,11 @@ else
 <%
         do while not rsLogs.EOF
             contador = contador + 1
-            dim usuarioReg, perfilReg, funcionalidadReg, tipoAccionReg, fechaReg, horaReg
+            dim idRegistroReg, usuarioReg, perfilReg, funcionalidadReg, tipoAccionReg, fechaReg, horaReg
+            idRegistroReg = ""
+            if not IsNull(rsLogs("id_registro")) then
+                idRegistroReg = rsLogs("id_registro")
+            end if
             usuarioReg = corregirTexto(rsLogs("usuario"))
             perfilReg = corregirTexto(rsLogs("perfil"))
             funcionalidadReg = corregirTexto(rsLogs("funcionalidad"))
@@ -161,6 +166,7 @@ else
 %>
 <tr>
     <td><%=contador%></td>
+    <td><%=idRegistroReg%></td>
     <td><%=Server.HTMLEncode(usuarioReg)%></td>
     <td>
 <%
@@ -186,7 +192,7 @@ else
         loop
 %>
 <tr>
-    <td colspan="7" style="text-align: right; background-color: #f5f5f5;">
+    <td colspan="8" style="text-align: right; background-color: #f5f5f5;">
         <strong>Total de registros: <%=totalRegistros%> | Mostrando página <%=page%></strong>
     </td>
 </tr>

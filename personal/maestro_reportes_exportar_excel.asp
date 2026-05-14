@@ -78,7 +78,7 @@ End If
 If rsPreguntas.State = 1 Then rsPreguntas.Close
 Set rsPreguntas = Nothing
 
-sqlDatos = "EXEC dbo.SP_SUC_listar_mae_rep_eva_cajero @TOP_REGISTROS = 5000, @FCH_DESDE = '" & filtroDesde & "', @FCH_HASTA = '" & filtroHasta & "'"
+sqlDatos = "EXEC dbo.SP_SUC_listar_mae_rep_eva_cajero @TOP_REGISTROS = 1000000, @FCH_DESDE = '" & filtroDesde & "', @FCH_HASTA = '" & filtroHasta & "'"
 Set rsDatos = db.Execute(sqlDatos)
 
 If Not rsDatos.EOF Then

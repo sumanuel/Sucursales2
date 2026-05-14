@@ -31,6 +31,7 @@ End Function
             <table class="table table-bordered table-hover">
               <thead>
                 <tr style="background-color: #f5f5f5;">
+                  <th>ID</th>
                   <th>Nombre Empresa</th>
                   <th>Tipo Servicio</th>
                   <th>N Contrato</th>
@@ -51,7 +52,7 @@ set rsProveedores = db.execute(sql)
 
 If Err.Number <> 0 Then
 %>
-<tr><td colspan="7" style="color: red;">Error SQL: <%= Err.Description %></td></tr>
+<tr><td colspan="8" style="color: red;">Error SQL: <%= Err.Description %></td></tr>
 <%
   Response.End
 End If
@@ -88,6 +89,7 @@ if not rsProveedores.EOF then
     end if
 %>
                 <tr>
+                  <td><%=idProveedor%></td>
                   <td><%=nombreEmpresa%></td>
                   <td><%=tipoServicio%></td>
                   <td><%=numeroContrato%></td>
@@ -107,7 +109,7 @@ if not rsProveedores.EOF then
   loop
 else
 %>
-                <tr><td colspan="7" style="text-align: center">No hay proveedores registrados</td></tr>
+                <tr><td colspan="8" style="text-align: center">No hay proveedores registrados</td></tr>
 <%
 end if
 rsProveedores.Close

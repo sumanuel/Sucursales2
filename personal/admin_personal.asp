@@ -332,7 +332,7 @@ if not rs.eof then
                         <span class="btnEvaluacionCajeros" id="btnEvaluacionCajeros">
                             <a class="btn btn-inverse" href="#" style="background-color: #2f6f4f; border-color: #2f6f4f; background-image: none;">
                                 <i class="icon-check icon-large"></i>
-                                &nbsp;<span class="bajaLetra"><b>EVALUACION CAJEROS</b></span>
+                                &nbsp;<span class="bajaLetra"><b>CAJEROS A EVALUAR</b></span>
                             </a>
                         </span>
                         &nbsp;&nbsp;

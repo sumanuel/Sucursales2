@@ -117,7 +117,7 @@ End If
 
 If rsEva.EOF Then
   Response.Write etiquetaFiltro
-  Response.Write "<table class=""table table-bordered table-hover""><thead><tr style=""background-color: #f5f5f5""><th>Rut</th><th>Nombre</th><th>Sucursal</th><th>Empresa</th><th>Desde</th><th>Hasta</th><th>Estado</th><th>Usuario</th><th>Fecha Registro</th><th style=""width: 70px; text-align: center"">Acciones</th></tr></thead><tbody><tr><td colspan=""10"" style=""text-align: center"">" & TextoSeguro(mensajeSinDatos) & "</td></tr></tbody></table>"
+  Response.Write "<table class=""table table-bordered table-hover""><thead><tr style=""background-color: #f5f5f5""><th>ID</th><th>Rut</th><th>Nombre</th><th>Sucursal</th><th>Empresa</th><th>Desde</th><th>Hasta</th><th>Estado</th><th>Usuario</th><th>Fecha Registro</th><th style=""width: 70px; text-align: center"">Acciones</th></tr></thead><tbody><tr><td colspan=""11"" style=""text-align: center"">" & TextoSeguro(mensajeSinDatos) & "</td></tr></tbody></table>"
   Response.End
 End If
 
@@ -172,13 +172,14 @@ Response.Write ".estado-evaluacion-default{background-color:#999;}"
 Response.Write ".paginacion-evaluacion{text-align:center;margin-top:15px;}"
 Response.Write "</style>"
 Response.Write etiquetaFiltro
-Response.Write "<table class=""table table-bordered table-hover""><thead><tr style=""background-color: #f5f5f5""><th>Rut</th><th>Nombre</th><th>Sucursal</th><th>Empresa</th><th>Desde</th><th>Hasta</th><th>Estado</th><th>Usuario</th><th>Fecha Registro</th><th style=""width: 70px; text-align: center"">Acciones</th></tr></thead><tbody>"
+Response.Write "<table class=""table table-bordered table-hover""><thead><tr style=""background-color: #f5f5f5""><th>ID</th><th>Rut</th><th>Nombre</th><th>Sucursal</th><th>Empresa</th><th>Desde</th><th>Hasta</th><th>Estado</th><th>Usuario</th><th>Fecha Registro</th><th style=""width: 70px; text-align: center"">Acciones</th></tr></thead><tbody>"
 
 For i = inicioIndice To finIndice
   idEva = Trim(datosEva(idxIdEva, i) & "")
   estadoTexto = Trim(datosEva(idxEstado, i) & "")
 
   Response.Write "<tr>"
+  Response.Write "<td>" & TextoSeguro(idEva) & "</td>"
   Response.Write "<td>" & TextoSeguro(datosEva(idxRut, i)) & "</td>"
   Response.Write "<td>" & TextoSeguro(datosEva(idxNombre, i)) & "</td>"
   Response.Write "<td>" & TextoSeguro(datosEva(idxSuc, i)) & "</td>"

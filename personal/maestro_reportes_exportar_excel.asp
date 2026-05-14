@@ -7,7 +7,7 @@ Response.Charset = "utf-8"
 Response.AddHeader "Content-Disposition", "attachment; filename=maestro_reportes_evaluacion_" & Right("0" & Day(Date()), 2) & "-" & Right("0" & Month(Date()), 2) & "-" & Year(Date()) & ".xls"
 
 Function XmlSafe(valor)
-  If IsNull(valor) Then valor = ""
+  If IsNull(valor) Or IsEmpty(valor) Then valor = ""
   valor = CStr(valor)
   valor = Replace(valor, "&", "&amp;")
   valor = Replace(valor, "<", "&lt;")
@@ -26,10 +26,16 @@ Function FechaSqlMr(valor)
 End Function
 
 Function FechaTextoMr(valorFecha)
-  If IsNull(valorFecha) Or Trim(CStr(valorFecha)) = "" Then
+  If IsNull(valorFecha) Or IsEmpty(valorFecha) Or Trim(CStr(valorFecha)) = "" Then
     FechaTextoMr = ""
   Else
-    FechaTextoMr = Right("0" & Day(CDate(valorFecha)), 2) & "-" & Right("0" & Month(CDate(valorFecha)), 2) & "-" & Year(CDate(valorFecha))
+    If Not IsDate(valorFecha) Then
+      FechaTextoMr = ""
+    ElseIf Year(CDate(valorFecha)) <= 1900 Then
+      FechaTextoMr = ""
+    Else
+      FechaTextoMr = Right("0" & Day(CDate(valorFecha)), 2) & "-" & Right("0" & Month(CDate(valorFecha)), 2) & "-" & Year(CDate(valorFecha))
+    End If
   End If
 End Function
 

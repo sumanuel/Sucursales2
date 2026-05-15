@@ -31,11 +31,7 @@ End Sub
 
 Dim idEva, evaCom, evaEst, respuestasTexto
 Dim idUsrWin, partesUsuario, usuarioEval
-Dim rsEva, rsPreguntas, rsTmp, sql
-Dim preguntasDict, respuestasDict
-Dim arrRespuestas, itemRespuesta, partesRespuesta
-Dim preId, valorRespuesta, key
-Dim recordsAffected
+Dim cmd, rsResultado, resultadoSp, mensajeSp
 
 idEva = 0
 If Trim(Request("id_eva") & "") <> "" And IsNumeric(Request("id_eva")) Then
@@ -78,140 +74,32 @@ If Len(usuarioEval) > 50 Then
   usuarioEval = Left(usuarioEval, 50)
 End If
 
-Set preguntasDict = Server.CreateObject("Scripting.Dictionary")
-Set respuestasDict = Server.CreateObject("Scripting.Dictionary")
+Set cmd = Server.CreateObject("ADODB.Command")
+cmd.ActiveConnection = DB
+cmd.NamedParameters = True
+cmd.CommandType = 4
+cmd.CommandText = "dbo.SP_SUC_guardar_eva_cajero"
+cmd.Parameters.Append cmd.CreateParameter("@ID_EVA", 3, 1, , idEva)
+cmd.Parameters.Append cmd.CreateParameter("@EVA_COM", 200, 1, 250, evaCom)
+cmd.Parameters.Append cmd.CreateParameter("@EVA_EST", 2, 1, , evaEst)
+cmd.Parameters.Append cmd.CreateParameter("@RESPUESTAS", 201, 1, Len(respuestasTexto), respuestasTexto)
+cmd.Parameters.Append cmd.CreateParameter("@EVA_USR", 200, 1, 50, usuarioEval)
 
-Set rsPreguntas = DB.Execute("EXEC dbo.SP_SUC_obtener_pre_eva_cajero")
-If Err.Number <> 0 Then
-  Responder "ERROR", Err.Description
-End If
-If rsPreguntas.EOF Then
-  Responder "ERROR", "No hay items habilitados para evaluar."
-End If
-If UCase(Trim(rsPreguntas.Fields(0).Name & "")) = "RESULTADO" Then
-  Responder "ERROR", Trim(rsPreguntas("mensaje") & "")
-End If
-Do While Not rsPreguntas.EOF
-  preguntasDict(Trim(rsPreguntas("PRE_ID_PRE") & "")) = ""
-  rsPreguntas.MoveNext
-Loop
-If rsPreguntas.State = 1 Then rsPreguntas.Close
-Set rsPreguntas = Nothing
-
-arrRespuestas = Split(respuestasTexto, "|")
-For Each itemRespuesta In arrRespuestas
-  itemRespuesta = Trim(itemRespuesta & "")
-  If itemRespuesta <> "" Then
-    partesRespuesta = Split(itemRespuesta, ":")
-    If UBound(partesRespuesta) <> 1 Then
-      Responder "ERROR", "El formato de las respuestas es invalido."
-    End If
-
-    preId = Trim(partesRespuesta(0) & "")
-    valorRespuesta = Trim(partesRespuesta(1) & "")
-
-    If Not IsNumeric(preId) Then
-      Responder "ERROR", "El item evaluado es invalido."
-    End If
-    If Not preguntasDict.Exists(preId) Then
-      Responder "ERROR", "Se recibio un item que no esta habilitado para evaluar."
-    End If
-    If Not IsNumeric(valorRespuesta) Then
-      Responder "ERROR", "La respuesta de uno de los items no es valida."
-    End If
-    valorRespuesta = CLng(valorRespuesta)
-    If valorRespuesta <> 0 And valorRespuesta <> 1 And valorRespuesta <> 2 Then
-      Responder "ERROR", "La respuesta de uno de los items no es valida."
-    End If
-    If respuestasDict.Exists(preId) Then
-      Responder "ERROR", "No se puede responder un mismo item mas de una vez."
-    End If
-
-    respuestasDict(preId) = valorRespuesta
-  End If
-Next
-
-If respuestasDict.Count <> preguntasDict.Count Then
-  Responder "ERROR", "Debe responder todos los items habilitados del formulario."
-End If
-
-Err.Clear
-DB.BeginTrans
+Set rsResultado = cmd.Execute
 If Err.Number <> 0 Then
   Responder "ERROR", Err.Description
 End If
 
-Set rsEva = DB.Execute("SELECT ID_EVA, EVA_EST FROM dbo.SUC_CAP_EVA WITH (UPDLOCK, HOLDLOCK) WHERE ID_EVA = " & idEva)
-If Err.Number <> 0 Then
-  DB.RollbackTrans
-  Responder "ERROR", Err.Description
-End If
-If rsEva.EOF Then
-  DB.RollbackTrans
-  Responder "ERROR", "No existe la evaluacion indicada."
-End If
-If CLng(rsEva("EVA_EST")) <> 1 Then
-  If rsEva.State = 1 Then rsEva.Close
-  Set rsEva = Nothing
-  DB.RollbackTrans
-  Responder "ERROR", "Esta evaluacion ya fue registrada y no puede repetirse."
-End If
-If rsEva.State = 1 Then rsEva.Close
-Set rsEva = Nothing
-
-Set rsTmp = DB.Execute("SELECT TOP 1 ID_EVA FROM dbo.SUC_CAP_RES WHERE ID_EVA = " & idEva)
-If Err.Number <> 0 Then
-  DB.RollbackTrans
-  Responder "ERROR", Err.Description
-End If
-If Not rsTmp.EOF Then
-  If rsTmp.State = 1 Then rsTmp.Close
-  Set rsTmp = Nothing
-  DB.RollbackTrans
-  Responder "ERROR", "Esta evaluacion ya fue registrada y no puede repetirse."
-End If
-If rsTmp.State = 1 Then rsTmp.Close
-Set rsTmp = Nothing
-
-For Each key In respuestasDict.Keys
-  sql = "INSERT INTO dbo.SUC_CAP_RES (PRE_ID_PRE, ID_EVA, RES_RES) VALUES (" & CLng(key) & ", " & idEva & ", " & CLng(respuestasDict(key)) & ")"
-  Err.Clear
-  DB.Execute sql, recordsAffected
-  If Err.Number <> 0 Then
-    DB.RollbackTrans
-    Responder "ERROR", Err.Description
-  End If
-Next
-
-sql = "UPDATE dbo.SUC_CAP_EVA SET "
-sql = sql & "EVA_COM = "
-If evaCom = "" Then
-  sql = sql & "NULL, "
-Else
-  sql = sql & "'" & SqlTexto(evaCom) & "', "
-End If
-sql = sql & "EVA_EST = " & evaEst & ", "
-sql = sql & "EVA_USR = '" & SqlTexto(usuarioEval) & "', "
-sql = sql & "EVA_FCH = GETDATE() "
-sql = sql & "WHERE ID_EVA = " & idEva & " AND EVA_EST = 1"
-Err.Clear
-DB.Execute sql, recordsAffected
-If Err.Number <> 0 Then
-  DB.RollbackTrans
-  Responder "ERROR", Err.Description
-End If
-If CLng(recordsAffected) <= 0 Then
-  DB.RollbackTrans
-  Responder "ERROR", "No fue posible actualizar el estado de la evaluacion."
+If rsResultado.EOF Then
+  Responder "ERROR", "No se obtuvo respuesta al guardar la evaluacion."
 End If
 
-Err.Clear
-DB.CommitTrans
-If Err.Number <> 0 Then
-  On Error Resume Next
-  DB.RollbackTrans
-  Responder "ERROR", Err.Description
+resultadoSp = Trim(rsResultado("resultado") & "")
+mensajeSp = Trim(rsResultado("mensaje") & "")
+
+If UCase(resultadoSp) <> "OK" Then
+  Responder "ERROR", mensajeSp
 End If
 
-Responder "OK", "La evaluacion fue guardada correctamente."
+Responder "OK", mensajeSp
 %>

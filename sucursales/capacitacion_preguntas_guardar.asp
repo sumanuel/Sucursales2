@@ -5,17 +5,28 @@ On Error Resume Next
 Response.ContentType = "application/json"
 Response.Charset = "UTF-8"
 
-Dim txt_TituloNuevaPregunta, txt_TextoNuevaPregunta, idUsrWin
+Dim txt_TituloNuevaPregunta, txt_TextoNuevaPregunta, idUsrWin, usuario, perfilLog, usuarios, usuarioWin
 
 txt_TituloNuevaPregunta = Request.Form("txt_TituloNuevaPregunta")
 txt_TextoNuevaPregunta = Request.Form("txt_TextoNuevaPregunta")
-idUsrWin = Request.ServerVariables("LOGON_USER")
+usuario = Trim(Request.Form("usuario_log") & "")
+perfilLog = Trim(Request.Form("perfil_log") & "")
 
-If InStr(idUsrWin, "\") > 0 Then
-    usuario = Mid(idUsrWin, InStr(idUsrWin, "\") + 1)
-Else
-    usuario = "SISTEMA"
+If usuario = "" Then
+    idUsrWin = Request.ServerVariables("LOGON_USER")
+    If idUsrWin <> "" Then
+        usuarios = Split(idUsrWin, "\")
+        If UBound(usuarios) >= 1 Then
+            usuarioWin = usuarios(1)
+        Else
+            usuarioWin = idUsrWin
+        End If
+        usuario = Trim(usuarioWin & "")
+    End If
 End If
+
+If usuario = "" Then usuario = "SISTEMA"
+If perfilLog = "" Then perfilLog = "General"
 
 If txt_TituloNuevaPregunta = "" Or txt_TextoNuevaPregunta = "" Then
     Response.Write "{""resultado"":""ERROR"",""mensaje"":""Campos requeridos""}"
@@ -26,7 +37,8 @@ Dim sql
 sql = "EXEC SP_SUC_CAP_INSERT "
 sql = sql & "@PRE_TIT='" & Replace(txt_TituloNuevaPregunta, "'", "''") & "',"
 sql = sql & "@PRE_PRE='" & Replace(txt_TextoNuevaPregunta, "'", "''") & "',"
-sql = sql & "@PRE_USR='" & Replace(usuario, "'", "''") & "'"
+sql = sql & "@PRE_USR='" & Replace(usuario, "'", "''") & "',"
+sql = sql & "@PRE_PERFIL='" & Replace(perfilLog, "'", "''") & "'"
 
 'response.write "sql:"&sql
 'response.End

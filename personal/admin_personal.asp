@@ -1161,10 +1161,11 @@ $('.btnPreguntasCapacitacionCajeros').click(function(){
     var datos = '';
     var pagina = '../sucursales/capacitacion_preguntas.asp';
     var perfilSimulado = '3'; // Simular perfil 3
+    var perfilLogMain = '<%=perfilLog%>';
     var idSucursalMain = '0'; // 0 para que muestre todas las sucursales
     var idUsuarioMain = '<%=usuarioLog%>';
     
-    datos = 'idSucursalMain=' + idSucursalMain + '&perfilMain=' + perfilSimulado + '&idUsuarioMain=' + idUsuarioMain;
+    datos = 'idSucursalMain=' + idSucursalMain + '&perfilMain=' + perfilSimulado + '&idUsuarioMain=' + encodeURIComponent(idUsuarioMain) + '&perfilLogMain=' + encodeURIComponent(perfilLogMain);
     enviaDatos(pagina, div, datos);
 });
 
@@ -1206,7 +1207,9 @@ $('.btnMaestroReportes').click(function(){
 
     $('#tbMaestroReportes').html('');
     var div = 'tbMaestroReportes';
-    var datos = '';
+    var idUsuarioMain = '<%=usuarioLog%>';
+    var perfilLogMain = '<%=perfilLog%>';
+    var datos = 'idUsuarioMain=' + encodeURIComponent(idUsuarioMain) + '&perfilLogMain=' + encodeURIComponent(perfilLogMain);
     var pagina = 'maestro_reportes.asp';
 
     enviaDatos(pagina, div, datos);

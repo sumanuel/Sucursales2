@@ -68,9 +68,43 @@ Dim preguntas, datos, respuestas
 Dim totalDatos, totalPreguntas
 Dim i, j, idsEva, llave
 Dim dicRespuestas
+Dim usuarioLog, perfilLog, idUsrWin, usuarios, usuarioWin
 
 filtroDesde = FechaSqlMr(Request("fch_desde"))
 filtroHasta = FechaSqlMr(Request("fch_hasta"))
+usuarioLog = Trim(Request("usuario_log") & "")
+perfilLog = Trim(Request("perfil_log") & "")
+
+If usuarioLog = "" Then
+  idUsrWin = Request.ServerVariables("LOGON_USER")
+  If idUsrWin <> "" Then
+    usuarios = Split(idUsrWin, "\")
+    If UBound(usuarios) >= 1 Then
+      usuarioWin = usuarios(1)
+    Else
+      usuarioWin = idUsrWin
+    End If
+    usuarioLog = Trim(usuarioWin & "")
+  End If
+End If
+
+If usuarioLog = "" Then
+  If Session("id_usuario") <> "" Then
+    usuarioLog = Trim(Session("id_usuario") & "")
+  End If
+  If usuarioLog = "" And Session("nombre_usuario") <> "" Then
+    usuarioLog = Trim(Session("nombre_usuario") & "")
+  End If
+End If
+
+If perfilLog = "" And Session("tipo") <> "" Then
+  perfilLog = Trim(Session("tipo") & "")
+End If
+
+If usuarioLog = "" Then usuarioLog = "Sistema"
+If perfilLog = "" Then perfilLog = "General"
+
+db.Execute "EXEC dbo.SCSS_insertar_reporte_log @usuario='" & Replace(usuarioLog, "'", "''") & "', @perfil='" & Replace(perfilLog, "'", "''") & "', @funcionalidad='Maestro y Reportes', @tipo_accion='Exportar Excel'"
 
 If filtroDesde = "" Then filtroDesde = FechaSqlMr(DateAdd("m", -3, Date()))
 If filtroHasta = "" Then filtroHasta = FechaSqlMr(Date())

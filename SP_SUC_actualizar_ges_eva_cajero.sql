@@ -17,6 +17,7 @@ BEGIN
 
     BEGIN TRY
         SET @EVA_USR = LTRIM(RTRIM(ISNULL(@EVA_USR, '')));
+        IF @EVA_USR = '' SET @EVA_USR = 'SISTEMA';
 
         IF @ID_EVA IS NULL OR @ID_EVA <= 0
         BEGIN
@@ -68,9 +69,16 @@ BEGIN
         UPDATE dbo.SUC_CAP_EVA
         SET EVA_FCH_DES = @EVA_FCH_DES,
             EVA_FCH_HAS = @EVA_FCH_HAS,
-            EVA_USR = CASE WHEN @EVA_USR = '' THEN EVA_USR ELSE @EVA_USR END,
+            EVA_USR = @EVA_USR,
             EVA_FCH = GETDATE()
         WHERE ID_EVA = @ID_EVA;
+
+        EXEC dbo.SCSS_insertar_reporte_log
+            @usuario = @EVA_USR,
+            @perfil = 'General',
+            @funcionalidad = 'Gestion de Cajeros a Evaluar',
+            @tipo_accion = 'Editar cajero a evaluar',
+            @id_registro = @ID_EVA;
 
         SELECT 'OK' AS resultado, 'Registro actualizado correctamente.' AS mensaje, CAST(@ID_EVA AS INT) AS id_eva;
     END TRY

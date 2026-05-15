@@ -15,6 +15,7 @@ BEGIN
 
     BEGIN TRY
         SET @EVA_USR = LTRIM(RTRIM(ISNULL(@EVA_USR, '')));
+        IF @EVA_USR = '' SET @EVA_USR = 'SISTEMA';
 
         IF @ID_EVA IS NULL OR @ID_EVA <= 0
         BEGIN
@@ -28,13 +29,20 @@ BEGIN
             RETURN;
         END;
 
-		IF EXISTS (SELECT 1 FROM dbo.SUC_CAP_EVA WHERE ID_EVA = @ID_EVA AND EVA_EST<>1)
+        IF EXISTS (SELECT 1 FROM dbo.SUC_CAP_EVA WHERE ID_EVA = @ID_EVA AND EVA_EST<>1)
         BEGIN
             SELECT 'ERROR' AS resultado, 'Solo se pueden eliminar evaluación esta estado de CAPACITACION.' AS mensaje, CAST(@ID_EVA AS INT) AS id_eva;
             RETURN;
         END;
 
-       DELETE FROM dbo.SUC_CAP_EVA WHERE ID_EVA = @ID_EVA;
+        DELETE FROM dbo.SUC_CAP_EVA WHERE ID_EVA = @ID_EVA;
+
+        EXEC dbo.SCSS_insertar_reporte_log
+            @usuario = @EVA_USR,
+            @perfil = 'General',
+            @funcionalidad = 'Gestion de Cajeros a Evaluar',
+            @tipo_accion = 'Eliminar cajero a evaluar',
+            @id_registro = @ID_EVA;
 
         SELECT 'OK' AS resultado, 'Registro eliminado correctamente.' AS mensaje, CAST(@ID_EVA AS INT) AS id_eva;
     END TRY

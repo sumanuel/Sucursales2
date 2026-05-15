@@ -1,8 +1,9 @@
 ﻿<%@LANGUAGE="VBSCRIPT" CODEPAGE="65001"%>
 <!--#include file="../conexion/conexion.asp"-->
-<% idSucursal=request("idSucursalMain") idUsuario =
-trim(request("idUsuarioMain")) perfil = trim(request("perfilMain")) ' Para
-perfil 3 (CENTRAL), no es necesario tener sucursal seleccionada %>
+<% idSucursal = Request("idSucursalMain") : idUsuario =
+Trim(Request("idUsuarioMain")) : perfil = Trim(Request("perfilMain")) :
+perfilLogMain = Trim(Request("perfilLogMain")) ' Para perfil 3 (CENTRAL), no es
+necesario tener sucursal seleccionada %>
 <style>
   .switchActiva {
     position: relative;
@@ -650,11 +651,15 @@ perfil 3 (CENTRAL), no es necesario tener sucursal seleccionada %>
   $(document).on('click', '.btnOrden', function(){
       var id = $(this).data('id');
       var orden = $(this).data('orden');
+      var usuarioLogActual = $("#cp_usuario_log").val() || "";
+      var perfilLogActual = $("#cp_perfil_log").val() || "General";
 
       var url_ajax='../sucursales/capacitacion_preguntas_orden.asp?id=' + id + '&orden=' + orden;
       <% If perfil <> "3" Then %>
           url_ajax='sucursales/capacitacion_preguntas_orden.asp?id=' + id + '&orden=' + orden;
       <% End If %>
+
+        url_ajax = url_ajax + '&usuario_log=' + encodeURIComponent(usuarioLogActual) + '&perfil_log=' + encodeURIComponent(perfilLogActual);
 
       $.ajax({
           url: url_ajax,
@@ -677,6 +682,8 @@ perfil 3 (CENTRAL), no es necesario tener sucursal seleccionada %>
 
   $(document).on('click', '.switch input[type="checkbox"]', function(e) {
       var id = $(this).data('id');
+      var usuarioLogActual = $("#cp_usuario_log").val() || "";
+      var perfilLogActual = $("#cp_perfil_log").val() || "General";
       e.preventDefault();
 
       var $checkbox = $(this);
@@ -693,7 +700,9 @@ perfil 3 (CENTRAL), no es necesario tener sucursal seleccionada %>
               url: url_ajax,
               type: 'POST',
               data: {
-                  id: id
+                id: id,
+                usuario_log: usuarioLogActual,
+                perfil_log: perfilLogActual
               },
               dataType: 'json',
               success: function(response) {
@@ -794,9 +803,14 @@ perfil 3 (CENTRAL), no es necesario tener sucursal seleccionada %>
   $("#formNuevaPregunta").submit(function (e) {
     e.preventDefault();
 
+    var usuarioLogActual = $("#cp_usuario_log").val() || "";
+    var perfilLogActual = $("#cp_perfil_log").val() || "General";
+
     var datos = {
       txt_TituloNuevaPregunta: $("#txt_TituloNuevaPregunta").val(),
       txt_TextoNuevaPregunta: $("#txt_TextoNuevaPregunta").val(),
+      usuario_log: usuarioLogActual,
+      perfil_log: perfilLogActual,
     };
 
     console.log("Enviando datos:", datos);
@@ -846,3 +860,14 @@ perfil 3 (CENTRAL), no es necesario tener sucursal seleccionada %>
     });
   });
 </script>
+
+<input
+  type="hidden"
+  id="cp_usuario_log"
+  value="<%=Server.HTMLEncode(idUsuario)%>"
+/>
+<input
+  type="hidden"
+  id="cp_perfil_log"
+  value="<%=Server.HTMLEncode(perfilLogMain)%>"
+/>

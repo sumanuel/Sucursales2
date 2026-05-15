@@ -1,4 +1,17 @@
+<%@LANGUAGE="VBSCRIPT" CODEPAGE="65001"%> <% Dim mrUsuarioLogMain,
+mrPerfilLogMain : mrUsuarioLogMain = Trim(Request("idUsuarioMain") & "") :
+mrPerfilLogMain = Trim(Request("perfilLogMain") & "") %>
 <div class="container-fluid" style="margin-top: 4px">
+  <input
+    type="hidden"
+    id="mr_usuario_log"
+    value="<%=Server.HTMLEncode(mrUsuarioLogMain)%>"
+  />
+  <input
+    type="hidden"
+    id="mr_perfil_log"
+    value="<%=Server.HTMLEncode(mrPerfilLogMain)%>"
+  />
   <div id="resultadoMaestroReportes"></div>
 
   <div class="row-fluid">
@@ -377,6 +390,9 @@
   $(document)
     .off("click", "#btnGuardarResultadoAreasCentrales")
     .on("click", "#btnGuardarResultadoAreasCentrales", function () {
+      var mrUsuarioLog = $("#mr_usuario_log").val() || "";
+      var mrPerfilLog = $("#mr_perfil_log").val() || "General";
+
       $.ajax({
         type: "POST",
         url: "maestro_reportes_guardar.asp",
@@ -385,6 +401,8 @@
         data: {
           id_eva: $("#mr_id_eva").val(),
           eva_com_cen: $.trim($("#mr_eva_com_cen").val() || ""),
+          usuario_log: mrUsuarioLog,
+          perfil_log: mrPerfilLog,
         },
         success: function (respuesta) {
           if (respuesta.resultado === "OK") {
@@ -430,10 +448,15 @@
   $(document)
     .off("click", "#btnExportarMaestroReportesExcel")
     .on("click", "#btnExportarMaestroReportesExcel", function () {
+      var mrUsuarioLog = $("#mr_usuario_log").val() || "";
+      var mrPerfilLog = $("#mr_perfil_log").val() || "General";
+
       if (!mrValidarFiltros()) {
         return;
       }
       var filtros = mrObtenerFiltros();
+      filtros.usuario_log = mrUsuarioLog;
+      filtros.perfil_log = mrPerfilLog;
       window.open(
         "maestro_reportes_exportar_excel.asp?" + $.param(filtros),
         "_blank",

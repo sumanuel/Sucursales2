@@ -22,12 +22,18 @@ BEGIN
 
     BEGIN TRY
         DECLARE @ID_SUCURSAL INT;
+        DECLARE @ID_EVA INT;
+        DECLARE @USUARIO_LOG VARCHAR(50);
 
         SET @EVA_RUT = LTRIM(RTRIM(ISNULL(@EVA_RUT, '')));
         SET @EVA_NOMBRE = LTRIM(RTRIM(ISNULL(@EVA_NOMBRE, '')));
         SET @EVA_EMP = LTRIM(RTRIM(ISNULL(@EVA_EMP, '')));
         SET @EVA_COM = LTRIM(RTRIM(ISNULL(@EVA_COM, '')));
         SET @EVA_USR = LTRIM(RTRIM(ISNULL(@EVA_USR, '')));
+        SET @USUARIO_LOG = @EVA_USR;
+
+        IF @USUARIO_LOG = ''
+            SET @USUARIO_LOG = 'SISTEMA';
 
         IF @EVA_RUT = ''
         BEGIN
@@ -146,7 +152,16 @@ BEGIN
             GETDATE()
         );
 
-        SELECT 'OK' AS resultado, 'Registro insertado correctamente.' AS mensaje, CAST(SCOPE_IDENTITY() AS INT) AS id_eva;
+        SET @ID_EVA = CAST(SCOPE_IDENTITY() AS INT);
+
+        EXEC dbo.SCSS_insertar_reporte_log
+            @usuario = @USUARIO_LOG,
+            @perfil = 'General',
+            @funcionalidad = 'Gestion de Cajeros a Evaluar',
+            @tipo_accion = 'Crear cajero a evaluar',
+            @id_registro = @ID_EVA;
+
+        SELECT 'OK' AS resultado, 'Registro insertado correctamente.' AS mensaje, @ID_EVA AS id_eva;
     END TRY
     BEGIN CATCH
         SELECT 'ERROR' AS resultado, ERROR_MESSAGE() AS mensaje, CAST(NULL AS INT) AS id_eva;

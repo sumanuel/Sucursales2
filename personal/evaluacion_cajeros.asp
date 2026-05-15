@@ -309,6 +309,21 @@
     );
 
     $.ajax({
+      url: "evaluacion_cajeros_registrar_log_upload.asp",
+      type: "POST",
+      dataType: "json",
+      cache: false,
+      data: {
+        archivo: resultado.archivo || "",
+      },
+      complete: function () {
+        procesarArchivoEvaluacionCajeros();
+      },
+    });
+  }
+
+  function procesarArchivoEvaluacionCajeros() {
+    $.ajax({
       url: "evaluacion_cajeros_procesar.asp",
       type: "POST",
       dataType: "json",

@@ -24,13 +24,77 @@ Function SqlTexto(valor)
   SqlTexto = Replace(CStr(valor), "'", "''")
 End Function
 
+Sub ObtenerUsuarioYPerfil(ByRef usuarioLog, ByRef perfilLog)
+  Dim idUsrWinLocal, partesUsuarioLocal, usuarioWinLocal
+
+  usuarioLog = Trim(Request("usuario_log") & "")
+  perfilLog = Trim(Request("perfil_log") & "")
+
+  If usuarioLog = "" Then
+    idUsrWinLocal = Request.ServerVariables("LOGON_USER")
+    If InStr(idUsrWinLocal, "\") > 0 Then
+      partesUsuarioLocal = Split(idUsrWinLocal, "\")
+      If UBound(partesUsuarioLocal) >= 1 Then
+        usuarioWinLocal = partesUsuarioLocal(1)
+      Else
+        usuarioWinLocal = idUsrWinLocal
+      End If
+    Else
+      usuarioWinLocal = idUsrWinLocal
+    End If
+    usuarioLog = Trim(usuarioWinLocal & "")
+  End If
+
+  If usuarioLog = "" Then
+    If Session("id_usuario") <> "" Then
+      usuarioLog = Trim(Session("id_usuario") & "")
+    End If
+    If usuarioLog = "" And Session("nombre_usuario") <> "" Then
+      usuarioLog = Trim(Session("nombre_usuario") & "")
+    End If
+  End If
+
+  If perfilLog = "" And Session("tipo") <> "" Then
+    perfilLog = Trim(Session("tipo") & "")
+  End If
+
+  If usuarioLog = "" Then usuarioLog = "JEPS"
+  If perfilLog = "" Then perfilLog = "General"
+End Sub
+
+Sub RegistrarLogGuardado(idRegistro, estadoEval, usuarioLog, perfilLog)
+  Dim accionLog, sqlLog
+
+  accionLog = "Guardar evaluacion"
+  If CLng(estadoEval) = 2 Then
+    accionLog = accionLog & " con estado Aprobado"
+  ElseIf CLng(estadoEval) = 3 Then
+    accionLog = accionLog & " con estado Reprobado"
+  End If
+
+  sqlLog = "IF NOT EXISTS ("
+  sqlLog = sqlLog & "SELECT 1 FROM dbo.SUC_reporte_log "
+  sqlLog = sqlLog & "WHERE funcionalidad='Evaluacion Cajeros' "
+  sqlLog = sqlLog & "AND tipo_accion='" & SqlTexto(accionLog) & "' "
+  sqlLog = sqlLog & "AND id_registro=" & CLng(idRegistro)
+  sqlLog = sqlLog & ") "
+  sqlLog = sqlLog & "EXEC dbo.SCSS_insertar_reporte_log "
+  sqlLog = sqlLog & "@usuario='" & SqlTexto(usuarioLog) & "', "
+  sqlLog = sqlLog & "@perfil='" & SqlTexto(perfilLog) & "', "
+  sqlLog = sqlLog & "@funcionalidad='Evaluacion Cajeros', "
+  sqlLog = sqlLog & "@tipo_accion='" & SqlTexto(accionLog) & "', "
+  sqlLog = sqlLog & "@id_registro=" & CLng(idRegistro)
+
+  DB.Execute sqlLog
+End Sub
+
 Sub Responder(resultado, mensaje)
   Response.Write "{""resultado"":""" & JsonSafe(resultado) & """,""mensaje"":""" & JsonSafe(mensaje) & """}"
   Response.End
 End Sub
 
 Dim idEva, evaCom, evaEst, respuestasTexto
-Dim idUsrWin, partesUsuario, usuarioEval
+Dim idUsrWin, partesUsuario, usuarioEval, perfilLog
 Dim cmd, rsResultado, resultadoSp, mensajeSp
 
 idEva = 0
@@ -59,17 +123,7 @@ If respuestasTexto = "" Then
   Responder "ERROR", "Debe enviar las respuestas de la evaluacion."
 End If
 
-idUsrWin = Request.ServerVariables("LOGON_USER")
-usuarioEval = Trim(idUsrWin & "")
-If InStr(usuarioEval, "\") > 0 Then
-  partesUsuario = Split(usuarioEval, "\")
-  If UBound(partesUsuario) >= 1 Then
-    usuarioEval = Trim(partesUsuario(1) & "")
-  End If
-End If
-If usuarioEval = "" Then
-  usuarioEval = "JEPS"
-End If
+Call ObtenerUsuarioYPerfil(usuarioEval, perfilLog)
 If Len(usuarioEval) > 50 Then
   usuarioEval = Left(usuarioEval, 50)
 End If
@@ -100,6 +154,8 @@ mensajeSp = Trim(rsResultado("mensaje") & "")
 If UCase(resultadoSp) <> "OK" Then
   Responder "ERROR", mensajeSp
 End If
+
+Call RegistrarLogGuardado(idEva, evaEst, usuarioEval, perfilLog)
 
 Responder "OK", mensajeSp
 %>
